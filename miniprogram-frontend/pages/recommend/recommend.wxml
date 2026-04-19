@@ -1,0 +1,47 @@
+<view class="page">
+  <view class="header-section" wx:if="{{healthInfo}}">
+    <view class="user-info">
+      <view class="info-row">
+        <text class="info-label">身高</text>
+        <text class="info-value">{{healthInfo.height}}cm</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">体重</text>
+        <text class="info-value">{{healthInfo.weight}}kg</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">BMI</text>
+        <text class="info-value bmi">{{bmi}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">目标</text>
+        <text class="info-value goal">{{healthInfo.goal}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="no-info-section" wx:else>
+    <view class="no-info-icon">📝</view>
+    <view class="no-info-text">请先填写健康信息</view>
+    <button class="fill-info-btn" bindtap="goToHealth">填写健康信息</button>
+  </view>
+
+  <view class="recommend-section" wx:if="{{recommendationsFormatted.length > 0}}">
+    <view class="section-title">为你推荐</view>
+    <view class="recommend-list">
+      <view 
+        wx:for="{{recommendationsFormatted}}" 
+        wx:key="recipeId" 
+        class="recommend-card"
+        data-id="{{item.recipeId}}"
+        bindtap="goToDetail"
+      >
+        <view class="card-content">
+          <view class="card-name">{{item.name}}</view>
+          <view class="card-score">推荐得分: {{item.scoreFormatted}}分</view>
+          <view class="card-reason">{{item.reason}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

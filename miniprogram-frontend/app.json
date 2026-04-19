@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/auth/login/login",
+    "pages/auth/register/register",
+    "pages/home/home",
+    "pages/recommend/recommend",
+    "pages/recipe/list/list",
+    "pages/recipe/detail/detail",
+    "pages/health/health",
+    "pages/record/record",
+    "pages/profile/profile",
+    "pages/chat/chat",
+    "pages/favorites/favorites"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "健康饮食推荐助手",
+    "navigationBarBackgroundColor": "#4CAF50",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#4CAF50",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/recipe/list/list",
+        "text": "食谱",
+        "iconPath": "images/recipe.png",
+        "selectedIconPath": "images/recipe-active.png"
+      },
+      {
+        "pagePath": "pages/record/record",
+        "text": "记录",
+        "iconPath": "images/record.png",
+        "selectedIconPath": "images/record-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

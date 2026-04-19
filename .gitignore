@@ -1,0 +1,62 @@
+# 后端 - Maven 相关
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+HELP.md
+
+# 后端 - IDE 相关
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans
+.sts4-cache
+
+# 后端 - 配置文件（含敏感信息）
+backend/src/main/resources/application.yaml
+backend/src/main/resources/application-*.yaml
+!backend/src/main/resources/application-example.yaml
+
+# 后端 - 编译输出
+backend/target/
+
+# 前端 - 小程序相关
+miniprogram-frontend/node_modules/
+miniprogram-frontend/.DS_Store
+miniprogram-frontend/.vscode/
+miniprogram-frontend/project.private.config.json
+project.private.config.json
+
+# 通用 - 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 通用 - 临时文件
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+
+# 通用 - 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 数据库相关
+*.sql.bak
+*.db
+*.sqlite

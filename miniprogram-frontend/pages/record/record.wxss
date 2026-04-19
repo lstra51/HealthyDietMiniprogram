@@ -1,0 +1,206 @@
+.page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 20rpx;
+}
+
+.summary-section {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  padding: 40rpx 20rpx;
+  color: #ffffff;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 24rpx;
+}
+
+.nutrition-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+}
+
+.summary-item {
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.summary-label {
+  font-size: 22rpx;
+  opacity: 0.85;
+}
+
+.records-section {
+  padding: 20rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+  color: #333333;
+}
+
+.add-btn {
+  padding: 12rpx 24rpx;
+  background-color: #4CAF50;
+  color: #ffffff;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  line-height: 1;
+  border: none;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80rpx 0;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.record-item {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.record-left {
+  flex: 1;
+}
+
+.meal-type {
+  font-size: 22rpx;
+  color: #4CAF50;
+  background-color: #e8f5e9;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+  margin-bottom: 8rpx;
+}
+
+.recipe-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.portion {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.record-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.record-calories {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ff6b6b;
+  margin-bottom: 4rpx;
+}
+
+.record-nutrition {
+  font-size: 20rpx;
+  color: #999999;
+  margin-bottom: 8rpx;
+}
+
+.delete-btn {
+  font-size: 22rpx;
+  color: #f44336;
+  padding: 8rpx 16rpx;
+  background-color: #ffebee;
+  border-radius: 8rpx;
+  align-self: flex-end;
+}
+
+.history-section {
+  padding: 0 20rpx;
+}
+
+.history-section .section-title {
+  color: #333333;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.history-item {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  gap: 20rpx;
+}
+
+.history-date {
+  font-size: 24rpx;
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.history-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.history-meal {
+  font-size: 22rpx;
+  color: #4CAF50;
+  background-color: #e8f5e9;
+  padding: 4rpx 10rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+}
+
+.history-name {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.history-calories {
+  font-size: 24rpx;
+  color: #ff6b6b;
+  font-weight: 500;
+}
