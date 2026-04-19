@@ -1,0 +1,84 @@
+<view class="page" wx:if="{{recipe}}">
+  <image class="recipe-image" src="{{recipe.image || 'https://via.placeholder.com/400'}}" mode="aspectFill" />
+  
+  <view class="content">
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">{{recipe.name}}</view>
+        <view class="favorite-btn" bindtap="toggleFavorite">
+          <text class="{{isFavorited ? 'favorited' : ''}}">{{isFavorited ? '❤️' : '🤍'}}</text>
+        </view>
+      </view>
+      <view class="tags">
+        <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">营养成分</view>
+      <view class="nutrition-grid">
+        <view class="nutrition-item">
+          <view class="nutrition-value">{{recipe.calories}}</view>
+          <view class="nutrition-label">千卡</view>
+        </view>
+        <view class="nutrition-item">
+          <view class="nutrition-value">{{recipe.protein}}</view>
+          <view class="nutrition-label">蛋白质(g)</view>
+        </view>
+        <view class="nutrition-item">
+          <view class="nutrition-value">{{recipe.carbs}}</view>
+          <view class="nutrition-label">碳水(g)</view>
+        </view>
+        <view class="nutrition-item">
+          <view class="nutrition-value">{{recipe.fat}}</view>
+          <view class="nutrition-label">脂肪(g)</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{recipe.ingredients && recipe.ingredients.length > 0}}">
+      <view class="section-title">食材</view>
+      <view class="ingredients">
+        <text wx:for="{{recipe.ingredients}}" wx:key="*this" class="ingredient">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{recipe.steps && recipe.steps.length > 0}}">
+      <view class="section-title">制作步骤</view>
+      <view class="steps">
+        <view wx:for="{{recipe.steps}}" wx:key="*this" class="step-item">
+          <view class="step-number">{{index + 1}}</view>
+          <view class="step-text">{{item}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="fixed-bottom">
+    <button class="add-record-btn" bindtap="showAddRecordModal">添加到饮食记录</button>
+  </view>
+
+  <view class="modal-mask {{showRecordModal ? 'show' : ''}}" bindtap="hideAddRecordModal"></view>
+  <view class="modal {{showRecordModal ? 'show' : ''}}">
+    <view class="modal-header">
+      <view class="modal-title">添加饮食记录</view>
+      <view class="modal-close" bindtap="hideAddRecordModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-item">
+        <view class="label">餐次</view>
+        <picker mode="selector" range="{{['早餐', '午餐', '晚餐', '加餐']}}" bindchange="onMealTypeChange">
+          <view class="picker">{{mealType}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <view class="label">份数</view>
+        <input class="input" type="digit" value="{{portion}}" bindinput="onPortionChange" placeholder="请输入份数" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn cancel" bindtap="hideAddRecordModal">取消</button>
+      <button class="modal-btn confirm" bindtap="addToRecord">确认</button>
+    </view>
+  </view>
+</view>

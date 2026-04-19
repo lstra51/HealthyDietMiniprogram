@@ -1,0 +1,58 @@
+<view class="page">
+  <view class="search-section">
+    <view class="search-box">
+      <input 
+        class="search-input" 
+        placeholder="搜索食谱" 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearch"
+      />
+      <button class="search-btn" bindtap="onSearch">搜索</button>
+    </view>
+  </view>
+
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x="true">
+      <view class="category-list">
+        <view 
+          wx:for="{{categories}}" 
+          wx:key="*this" 
+          class="category-item {{activeCategory === item ? 'active' : ''}}"
+          data-category="{{item}}"
+          bindtap="onCategoryTap"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="recipe-list">
+    <view 
+      wx:if="{{filteredRecipes.length === 0}}" 
+      class="empty-state"
+    >
+      暂无食谱
+    </view>
+    <view 
+      wx:else 
+      class="recipe-grid"
+    >
+      <view 
+        wx:for="{{filteredRecipes}}" 
+        wx:key="id" 
+        class="recipe-card"
+        data-id="{{item.id}}"
+        bindtap="goToDetail"
+      >
+        <image class="recipe-image" src="{{item.image || 'https://via.placeholder.com/200'}}" mode="aspectFill" />
+        <view class="recipe-info">
+          <view class="recipe-name">{{item.name}}</view>
+          <view class="recipe-category">{{item.category}}</view>
+          <view class="recipe-calories">{{item.calories}} 千卡</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

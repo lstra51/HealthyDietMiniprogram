@@ -1,0 +1,76 @@
+<view class="page">
+  <view class="header-section">
+    <view class="avatar" wx:if="{{userInfo && userInfo.avatarUrl}}">
+      <image class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+    </view>
+    <view class="avatar" wx:else>
+      <text class="avatar-text">{{avatarInitial}}</text>
+    </view>
+    <view class="user-name">{{displayName}}</view>
+  </view>
+
+  <view class="health-card" wx:if="{{healthInfo}}">
+    <view class="card-header">
+      <view class="card-title">健康信息</view>
+      <view class="edit-btn" bindtap="goToHealth">编辑</view>
+    </view>
+    <view class="health-info-grid">
+      <view class="info-item">
+        <view class="info-label">身高</view>
+        <view class="info-value">{{healthInfo.height}} cm</view>
+      </view>
+      <view class="info-item">
+        <view class="info-label">体重</view>
+        <view class="info-value">{{healthInfo.weight}} kg</view>
+      </view>
+      <view class="info-item">
+        <view class="info-label">性别</view>
+        <view class="info-value">{{healthInfo.gender}}</view>
+      </view>
+      <view class="info-item">
+        <view class="info-label">目标</view>
+        <view class="info-value">{{healthInfo.goal}}</view>
+      </view>
+    </view>
+    <view class="bmi-section">
+      <view class="bmi-label">BMI 指数</view>
+      <view class="bmi-display">
+        <text class="bmi-value">{{bmi}}</text>
+        <text class="bmi-status {{bmiStatus}}">{{bmiStatus}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="no-health-card" wx:else>
+    <view class="no-health-icon">📝</view>
+    <view class="no-health-text">还没有填写健康信息</view>
+    <button class="fill-health-btn" bindtap="goToHealth">填写健康信息</button>
+  </view>
+
+  <view class="menu-section">
+    <view class="menu-item" bindtap="goToFavorites">
+      <view class="menu-icon">❤️</view>
+      <view class="menu-label">我的收藏</view>
+      <view class="menu-arrow">›</view>
+    </view>
+    <view class="menu-item" bindtap="goToHealth">
+      <view class="menu-icon">⚙️</view>
+      <view class="menu-label">修改健康信息</view>
+      <view class="menu-arrow">›</view>
+    </view>
+    <view class="menu-item" bindtap="goToRecommend">
+      <view class="menu-icon">🎯</view>
+      <view class="menu-label">查看个性化推荐</view>
+      <view class="menu-arrow">›</view>
+    </view>
+    <view class="menu-item" bindtap="goToRecord">
+      <view class="menu-icon">📊</view>
+      <view class="menu-label">饮食记录统计</view>
+      <view class="menu-arrow">›</view>
+    </view>
+  </view>
+
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="onLogout">退出登录</button>
+  </view>
+</view>
