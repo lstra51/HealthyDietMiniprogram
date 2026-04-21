@@ -178,5 +178,11 @@ Page({
     wx.navigateTo({
       url: '/pages/auth/register/register'
     });
+  },
+
+  goBack() {
+    wx.switchTab({
+      url: '/pages/home/home'
+    });
   }
 });

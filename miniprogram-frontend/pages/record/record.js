@@ -20,8 +20,26 @@ Page({
   },
 
   onShow() {
-    if (!app.globalData.isLoggedIn) return;
+    if (!app.globalData.isLoggedIn) {
+      this.clearData();
+      this.checkNeedLogin();
+      return;
+    }
     this.loadRecords();
+  },
+
+  clearData() {
+    this.setData({
+      todayRecords: [],
+      todayTotal: {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0
+      },
+      allRecords: [],
+      today: ''
+    });
   },
 
   checkNeedLogin() {

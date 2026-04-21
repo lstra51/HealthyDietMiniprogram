@@ -16,9 +16,22 @@ Page({
   },
 
   onShow() {
-    if (!app.globalData.isLoggedIn) return;
+    if (!app.globalData.isLoggedIn) {
+      this.clearData();
+      this.checkNeedLogin();
+      return;
+    }
     this.loadHealthInfo();
     this.loadRecommendations();
+  },
+
+  clearData() {
+    this.setData({
+      recommendations: [],
+      recommendationsFormatted: [],
+      healthInfo: null,
+      bmi: ''
+    });
   },
 
   checkNeedLogin() {
@@ -34,7 +47,9 @@ Page({
               url: '/pages/auth/login/login'
             });
           } else {
-            wx.navigateBack();
+            wx.switchTab({
+              url: '/pages/home/home'
+            });
           }
         }
       });

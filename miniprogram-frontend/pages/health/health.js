@@ -30,13 +30,27 @@ Page({
               url: '/pages/auth/login/login'
             });
           } else {
-            wx.navigateBack();
+            wx.switchTab({
+              url: '/pages/home/home'
+            });
           }
         }
       });
       return false;
     }
     return true;
+  },
+
+  clearData() {
+    this.setData({
+      height: '',
+      weight: '',
+      gender: '男',
+      goal: '减脂',
+      goalText: '减脂',
+      bmi: '',
+      bmiStatus: ''
+    });
   },
 
   loadSavedInfo() {

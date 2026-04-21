@@ -30,7 +30,18 @@ Page({
   onShow() {
     this.checkLoginStatus();
     this.checkHealthInfo();
-    this.loadTodayRecommendation();
+    if (!app.globalData.isLoggedIn) {
+      this.clearData();
+    } else {
+      this.loadTodayRecommendation();
+    }
+  },
+
+  clearData() {
+    this.setData({
+      todayRecommendation: null,
+      todayRecommendationFormatted: null
+    });
   },
 
   checkLoginStatus() {

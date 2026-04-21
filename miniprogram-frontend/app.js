@@ -23,7 +23,22 @@ App({
       } else {
         this.loadHealthInfo(userInfo.id);
       }
+    } else {
+      // 确保退出登录后清理所有数据
+      this.globalData.userInfo = null;
+      this.globalData.healthInfo = null;
+      this.globalData.isLoggedIn = false;
+      this.globalData.chatMessages = null;
     }
+  },
+
+  logout() {
+    this.globalData.userInfo = null;
+    this.globalData.healthInfo = null;
+    this.globalData.isLoggedIn = false;
+    this.globalData.chatMessages = null;
+    wx.removeStorageSync('userInfo');
+    wx.removeStorageSync('healthInfo');
   },
 
   calculateBMI(height, weight) {

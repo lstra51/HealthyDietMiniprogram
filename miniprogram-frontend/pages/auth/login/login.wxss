@@ -95,6 +95,12 @@
   margin-top: 0;
 }
 
+.btn-cancel {
+  background-color: transparent;
+  color: #999999;
+  margin-top: 12rpx;
+}
+
 .wechat-icon {
   width: 36rpx;
   height: 36rpx;
