@@ -9,7 +9,13 @@
     <view class="user-name">{{displayName}}</view>
   </view>
 
-  <view class="health-card" wx:if="{{healthInfo}}">
+  <view class="login-prompt-card" wx:if="{{!userInfo}}">
+    <view class="login-prompt-icon">👤</view>
+    <view class="login-prompt-text">登录后查看个人信息</view>
+    <button class="login-prompt-btn" bindtap="goToLogin">立即登录</button>
+  </view>
+
+  <view class="health-card" wx:if="{{userInfo && healthInfo}}">
     <view class="card-header">
       <view class="card-title">健康信息</view>
       <view class="edit-btn" bindtap="goToHealth">编辑</view>
@@ -41,13 +47,13 @@
     </view>
   </view>
 
-  <view class="no-health-card" wx:else>
+  <view class="no-health-card" wx:if="{{userInfo && !healthInfo}}">
     <view class="no-health-icon">📝</view>
     <view class="no-health-text">还没有填写健康信息</view>
     <button class="fill-health-btn" bindtap="goToHealth">填写健康信息</button>
   </view>
 
-  <view class="menu-section">
+  <view class="menu-section" wx:if="{{userInfo}}">
     <view class="menu-item" bindtap="goToFavorites">
       <view class="menu-icon">❤️</view>
       <view class="menu-label">我的收藏</view>
@@ -70,7 +76,7 @@
     </view>
   </view>
 
-  <view class="logout-section">
+  <view class="logout-section" wx:if="{{userInfo}}">
     <button class="logout-btn" bindtap="onLogout">退出登录</button>
   </view>
 </view>

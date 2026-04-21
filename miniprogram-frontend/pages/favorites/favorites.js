@@ -8,11 +8,35 @@ Page({
   },
 
   onLoad() {
+    if (!this.checkNeedLogin()) return;
     this.loadFavorites();
   },
 
   onShow() {
+    if (!app.globalData.isLoggedIn) return;
     this.loadFavorites();
+  },
+
+  checkNeedLogin() {
+    if (!app.globalData.isLoggedIn) {
+      wx.showModal({
+        title: '需要登录',
+        content: '此功能需要登录后才能使用，是否前往登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/auth/login/login'
+            });
+          } else {
+            wx.navigateBack();
+          }
+        }
+      });
+      return false;
+    }
+    return true;
   },
 
   async loadFavorites() {

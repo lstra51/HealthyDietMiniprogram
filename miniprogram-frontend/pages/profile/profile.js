@@ -20,6 +20,26 @@ Page({
     this.loadHealthInfo();
   },
 
+  checkNeedLogin(callback) {
+    if (!app.globalData.isLoggedIn) {
+      wx.showModal({
+        title: '需要登录',
+        content: '此功能需要登录后才能使用，是否前往登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/auth/login/login'
+            });
+          }
+        }
+      });
+      return false;
+    }
+    return true;
+  },
+
   loadUserInfo() {
     const userInfo = app.globalData.userInfo;
     let displayName = '用户';
@@ -60,30 +80,35 @@ Page({
   },
 
   goToHealth() {
+    if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/health/health'
     });
   },
 
   goToFavorites() {
+    if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/favorites/favorites'
     });
   },
 
   goToRecommend() {
+    if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/recommend/recommend'
     });
   },
 
   goToRecord() {
+    if (!this.checkNeedLogin()) return;
     wx.switchTab({
       url: '/pages/record/record'
     });
   },
 
   onLogout() {
+    if (!this.checkNeedLogin()) return;
     wx.showModal({
       title: '确认退出',
       content: '确定要退出登录吗？',
@@ -101,12 +126,18 @@ Page({
           });
 
           setTimeout(() => {
-            wx.reLaunch({
-              url: '/pages/auth/login/login'
+            wx.switchTab({
+              url: '/pages/home/home'
             });
           }, 1000);
         }
       }
+    });
+  },
+
+  goToLogin() {
+    wx.navigateTo({
+      url: '/pages/auth/login/login'
     });
   }
 });
