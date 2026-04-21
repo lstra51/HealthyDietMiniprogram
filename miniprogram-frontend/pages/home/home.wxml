@@ -52,10 +52,10 @@
           <view class="entry-icon">🎯</view>
           <view class="entry-label">个性化推荐</view>
         </view>
-        <view class="entry-item" bindtap="goToChat">
+        <!-- <view class="entry-item" bindtap="goToChat">
           <view class="entry-icon">🤖</view>
           <view class="entry-label">AI营养师</view>
-        </view>
+        </view> -->
       </view>
     </view>
   </view>

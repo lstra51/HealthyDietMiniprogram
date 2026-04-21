@@ -34,9 +34,10 @@
     <view class="button-group">
       <button class="btn btn-primary" bindtap="onLogin">登录</button>
       <button class="btn btn-plain" bindtap="onGoRegister">去注册</button>
+      <button class="btn btn-cancel" bindtap="goBack">取消登录</button>
     </view>
 
-    <view class="divider">
+    <!-- <view class="divider">
       <view class="divider-line"></view>
       <view class="divider-text">微信一键登录</view>
       <view class="divider-line"></view>
@@ -45,6 +46,6 @@
     <button class="btn btn-wechat" bindtap="onWechatLogin">
       <image class="wechat-icon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMkMyIDE3LjUyIDYuNDggMjIgMTIgMjJDMTcuNTIgMjIgMjIgMTcuNTIgMjIgMTJDMjIgNi40OCAxNy41MiAyIDEyIDJaTTkuNSAxNEM4LjEyIDE0IDcgMTMuMTEgNyAxMi4wNUM3IDExIDguMTIgMTAuMSA5LjUgMTAuMUMxMC44OCAxMC4xIDEyIDExIDExLjk5IDEyLjA1QzExLjk5IDEzLjExIDEwLjg4IDE0IDkuNSAxNFpNMTQuNSAxNEMxMy4xMiAxNCAxMiAxMy4xMSAxMiAxMi4wNUwxMiAxMi4wNUMxMiAxMSAxMy4xMiAxMC4xIDE0LjUgMTAuMUMxNS44OCAxMC4xIDE3IDExIDE3IDEyLjA1QzE3IDEzLjExIDE1Ljg4IDE0IDE0LjUgMTRaIiBmaWxsPSIjMDdDMTYwIi8+Cjwvc3ZnPg==" />
       微信一键登录
-    </button>
+    </button> -->
   </view>
 </view>

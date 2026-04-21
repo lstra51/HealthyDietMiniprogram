@@ -17,7 +17,22 @@ Page({
 
   onShow() {
     this.loadUserInfo();
-    this.loadHealthInfo();
+    if (!app.globalData.isLoggedIn) {
+      this.clearData();
+    } else {
+      this.loadHealthInfo();
+    }
+  },
+
+  clearData() {
+    this.setData({
+      userInfo: null,
+      displayName: '用户',
+      avatarInitial: '?',
+      healthInfo: null,
+      bmi: '',
+      bmiStatus: ''
+    });
   },
 
   checkNeedLogin(callback) {
@@ -114,11 +129,8 @@ Page({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          app.globalData.userInfo = null;
-          app.globalData.healthInfo = null;
-          app.globalData.isLoggedIn = false;
-          wx.removeStorageSync('userInfo');
-          wx.removeStorageSync('healthInfo');
+          // 使用 app.logout() 统一处理退出登录
+          app.logout();
           
           wx.showToast({
             title: '已退出登录',
