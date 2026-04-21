@@ -38,6 +38,34 @@
   font-weight: 600;
 }
 
+.login-prompt-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  margin: 20rpx;
+  padding: 40rpx 28rpx;
+  text-align: center;
+}
+
+.login-prompt-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.login-prompt-text {
+  font-size: 28rpx;
+  color: #999999;
+  margin-bottom: 24rpx;
+}
+
+.login-prompt-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border-radius: 50rpx;
+  padding: 24rpx 48rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
 .health-card,
 .no-health-card {
   background-color: #ffffff;

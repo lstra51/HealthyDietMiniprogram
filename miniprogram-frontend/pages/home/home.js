@@ -7,7 +7,8 @@ Page({
     todayRecommendationFormatted: null,
     healthInfoFilled: false,
     userName: '',
-    currentDate: ''
+    currentDate: '',
+    isLoggedIn: false
   },
 
   onLoad() {
@@ -29,16 +30,13 @@ Page({
   onShow() {
     this.checkLoginStatus();
     this.checkHealthInfo();
+    this.loadTodayRecommendation();
   },
 
   checkLoginStatus() {
-    if (!app.globalData.isLoggedIn) {
-      wx.reLaunch({
-        url: '/pages/auth/login/login'
-      });
-      return;
-    }
-    if (app.globalData.userInfo) {
+    const isLoggedIn = app.globalData.isLoggedIn;
+    this.setData({ isLoggedIn });
+    if (isLoggedIn && app.globalData.userInfo) {
       const userInfo = app.globalData.userInfo;
       const displayName = userInfo.nickname || userInfo.username || '用户';
       this.setData({ userName: displayName });
@@ -72,7 +70,28 @@ Page({
     this.setData({ healthInfoFilled: !!app.globalData.healthInfo });
   },
 
+  checkNeedLogin() {
+    if (!app.globalData.isLoggedIn) {
+      wx.showModal({
+        title: '需要登录',
+        content: '此功能需要登录后才能使用，是否前往登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/auth/login/login'
+            });
+          }
+        }
+      });
+      return false;
+    }
+    return true;
+  },
+
   onViewTodayDetail() {
+    if (!this.checkNeedLogin()) return;
     if (this.data.todayRecommendation) {
       wx.navigateTo({
         url: `/pages/recipe/detail/detail?id=${this.data.todayRecommendation.recipeId}`
@@ -81,6 +100,7 @@ Page({
   },
 
   goToRecommend() {
+    if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/recommend/recommend'
     });
@@ -93,14 +113,22 @@ Page({
   },
 
   goToHealth() {
+    if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/health/health'
     });
   },
 
   goToChat() {
+    if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/chat/chat'
+    });
+  },
+
+  goToLogin() {
+    wx.navigateTo({
+      url: '/pages/auth/login/login'
     });
   }
 });

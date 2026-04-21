@@ -14,6 +14,7 @@ Page({
   },
 
   onLoad() {
+    if (!this.checkNeedLogin()) return;
     if (app.globalData.chatMessages && app.globalData.chatMessages.length > 0) {
       this.setData({
         messages: app.globalData.chatMessages
@@ -22,7 +23,8 @@ Page({
       const defaultMessages = [
         {
           role: 'assistant',
-          content: '你好！我是你的AI营养师，有什么可以帮助你的吗？'
+          //content: '你好！我是你的AI营养师，有什么可以帮助你的吗？'
+          content: 'AI问答功能正在开发中，敬请期待！'
         }
       ];
       this.setData({
@@ -30,6 +32,28 @@ Page({
       });
       app.globalData.chatMessages = defaultMessages;
     }
+  },
+
+  checkNeedLogin() {
+    if (!app.globalData.isLoggedIn) {
+      wx.showModal({
+        title: '需要登录',
+        content: '此功能需要登录后才能使用，是否前往登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/auth/login/login'
+            });
+          } else {
+            wx.navigateBack();
+          }
+        }
+      });
+      return false;
+    }
+    return true;
   },
 
   onShow() {
@@ -77,7 +101,27 @@ Page({
     app.globalData.chatMessages = newMessages;
 
     this.scrollToBottom();
-    this.connectWebSocket(text);
+    //this.connectWebSocket(text);
+    wx.showToast({
+      title: 'AI问答功能正在开发中，敬请期待！',
+      icon: 'none',
+      duration: 2000
+    });
+    
+    setTimeout(() => {
+      const assistantMessage = {
+        role: 'assistant',
+        content: '抱歉，AI问答功能正在开发中，敬请期待！'
+      };
+      const updatedMessages = [...newMessages, assistantMessage];
+      this.setData({
+        messages: updatedMessages,
+        loading: false,
+        isStreaming: false
+      });
+      app.globalData.chatMessages = updatedMessages;
+      this.scrollToBottom();
+    }, 500);
   },
 
   connectWebSocket(userMessage) {
