@@ -1,16 +1,11 @@
-package com.cupk.healthy_diet.vo;
+package com.cupk.healthy_diet.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RecipeDetailVO {
-    private Integer id;
+public class CreateRecipeDTO {
     private String name;
     private String category;
     private String image;
@@ -21,8 +16,6 @@ public class RecipeDetailVO {
     private Double fat;
     private List<String> ingredients;
     private List<String> tags;
-    private List<String> steps;
     private List<String> suitableGoals;
-    private String status;
-    private String rejectReason;
+    private List<String> steps;
 }

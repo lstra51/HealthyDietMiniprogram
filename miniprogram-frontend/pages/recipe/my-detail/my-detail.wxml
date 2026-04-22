@@ -1,0 +1,91 @@
+<view class="page" wx:if="{{recipe}}">
+  <!-- 审核状态标签 -->
+  <view class="status-box">
+    <view class="status-tag status-{{recipe.status}}">
+      <text wx:if="{{recipe.status === 'pending'}}">⏳ 待审核</text>
+      <text wx:if="{{recipe.status === 'approved'}}">✅ 已通过</text>
+      <text wx:if="{{recipe.status === 'rejected'}}">❌ 已拒绝</text>
+    </view>
+  </view>
+
+  <view class="reject-box" wx:if="{{recipe.rejectReason}}">
+    <view class="reject-title">审核拒绝原因</view>
+    <view class="reject-reason">{{recipe.rejectReason}}</view>
+  </view>
+
+  <scroll-view class="content" scroll-y="true">
+    <view class="section">
+      <view class="section-title">基本信息</view>
+      <image class="recipe-image" src="{{recipe.image}}" mode="aspectFill"></image>
+      <view class="info-item">
+        <view class="label">食谱名称</view>
+        <view class="value">{{recipe.name}}</view>
+      </view>
+      <view class="info-item">
+        <view class="label">分类</view>
+        <view class="value">{{recipe.category}}</view>
+      </view>
+      <view class="info-item">
+        <view class="label">描述</view>
+        <view class="value">{{recipe.description}}</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">营养成分</view>
+      <view class="nutrition-grid">
+        <view class="nutrition-item">
+          <view class="label">热量</view>
+          <view class="value">{{recipe.calories}}千卡</view>
+        </view>
+        <view class="nutrition-item">
+          <view class="label">蛋白质</view>
+          <view class="value">{{recipe.protein}}g</view>
+        </view>
+        <view class="nutrition-item">
+          <view class="label">碳水</view>
+          <view class="value">{{recipe.carbs}}g</view>
+        </view>
+        <view class="nutrition-item">
+          <view class="label">脂肪</view>
+          <view class="value">{{recipe.fat}}g</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{recipe.ingredients && recipe.ingredients.length > 0}}">
+      <view class="section-title">食材</view>
+      <view class="list">
+        <view class="list-item" wx:for="{{recipe.ingredients}}" wx:key="index">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{recipe.tags && recipe.tags.length > 0}}">
+      <view class="section-title">标签</view>
+      <view class="tags">
+        <view class="tag" wx:for="{{recipe.tags}}" wx:key="index">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{recipe.suitableGoals && recipe.suitableGoals.length > 0}}">
+      <view class="section-title">适用目标</view>
+      <view class="tags">
+        <view class="tag" wx:for="{{recipe.suitableGoals}}" wx:key="index">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{recipe.steps && recipe.steps.length > 0}}">
+      <view class="section-title">制作步骤</view>
+      <view class="steps">
+        <view class="step-item" wx:for="{{recipe.steps}}" wx:key="index">
+          <view class="step-number">{{index + 1}}</view>
+          <view class="step-content">{{item}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="footer" wx:if="{{recipe.rejectReason}}">
+    <button class="edit-btn" bindtap="edit">编辑并重新提交</button>
+  </view>
+</view>

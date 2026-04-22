@@ -27,6 +27,12 @@ public class Recipe {
 
     private Double fat;
 
+    private Integer userId;
+
+    private String status;
+
+    private String rejectReason;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

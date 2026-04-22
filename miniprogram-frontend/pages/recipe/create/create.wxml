@@ -1,0 +1,114 @@
+<view class="page">
+  <scroll-view class="content" scroll-y="true">
+    <view class="section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <view class="label">食谱名称 *</view>
+        <input class="input" placeholder="请输入食谱名称" value="{{name}}" data-field="name" bindinput="onInput" />
+      </view>
+
+      <view class="form-item">
+        <view class="label">分类 *</view>
+        <picker mode="selector" range="{{categories}}" value="{{categories.indexOf(category)}}" bindchange="onCategoryChange">
+          <view class="picker">{{category}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <view class="label">图片</view>
+        <view class="image-upload">
+          <view wx:if="{{image}}" class="image-preview">
+            <image src="{{image}}" mode="aspectFill" class="preview-img" />
+            <view class="image-delete" bindtap="clearImage">×</view>
+          </view>
+          <view wx:else class="upload-btn" bindtap="chooseImage">
+            <view class="upload-icon">+</view>
+            <view class="upload-text">点击上传</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">描述</view>
+        <textarea class="textarea" placeholder="请输入食谱描述" value="{{description}}" data-field="description" bindinput="onInput" maxlength="500" />
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">营养成分</view>
+      
+      <view class="nutrition-grid">
+        <view class="nutrition-item">
+          <view class="label">热量(千卡)*</view>
+          <input class="input" type="number" placeholder="0" value="{{calories}}" data-field="calories" bindinput="onNumberInput" />
+        </view>
+        <view class="nutrition-item">
+          <view class="label">蛋白质(g)</view>
+          <input class="input" type="digit" placeholder="0" value="{{protein}}" data-field="protein" bindinput="onNumberInput" />
+        </view>
+        <view class="nutrition-item">
+          <view class="label">碳水(g)</view>
+          <input class="input" type="digit" placeholder="0" value="{{carbs}}" data-field="carbs" bindinput="onNumberInput" />
+        </view>
+        <view class="nutrition-item">
+          <view class="label">脂肪(g)</view>
+          <input class="input" type="digit" placeholder="0" value="{{fat}}" data-field="fat" bindinput="onNumberInput" />
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">食材</view>
+      <view class="dynamic-list">
+        <view wx:for="{{ingredients}}" wx:key="index" class="list-item">
+          <input class="input" placeholder="请输入食材" value="{{item}}" data-index="{{index}}" bindinput="onIngredientInput" />
+          <view wx:if="{{ingredients.length > 1}}" class="delete-btn" data-index="{{index}}" bindtap="removeIngredient">×</view>
+        </view>
+        <view class="add-btn" bindtap="addIngredient">+ 添加食材</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">标签</view>
+      <view class="dynamic-list">
+        <view wx:for="{{tags}}" wx:key="index" class="list-item">
+          <input class="input" placeholder="请输入标签" value="{{item}}" data-index="{{index}}" bindinput="onTagInput" />
+          <view wx:if="{{tags.length > 1}}" class="delete-btn" data-index="{{index}}" bindtap="removeTag">×</view>
+        </view>
+        <view class="add-btn" bindtap="addTag">+ 添加标签</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">适用目标</view>
+      <view class="dynamic-list">
+        <view wx:for="{{suitableGoals}}" wx:key="index" class="list-item">
+          <picker mode="selector" range="{{goals}}" value="{{goals.indexOf(item)}}" data-index="{{index}}" bindchange="onGoalChange">
+            <view class="picker">{{item}}</view>
+          </picker>
+          <view wx:if="{{suitableGoals.length > 1}}" class="delete-btn" data-index="{{index}}" bindtap="removeGoal">×</view>
+        </view>
+        <view class="add-btn" bindtap="addGoal">+ 添加目标</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">制作步骤</view>
+      <view class="dynamic-list">
+        <view wx:for="{{steps}}" wx:key="index" class="list-item step-item">
+          <view class="step-number">{{index + 1}}</view>
+          <textarea class="textarea" placeholder="请输入步骤内容" value="{{item}}" data-index="{{index}}" bindinput="onStepInput" />
+          <view wx:if="{{steps.length > 1}}" class="delete-btn" data-index="{{index}}" bindtap="removeStep">×</view>
+        </view>
+        <view class="add-btn" bindtap="addStep">+ 添加步骤</view>
+      </view>
+    </view>
+
+    <view class="submit-section">
+      <button class="submit-btn" bindtap="submit" disabled="{{loading}}">
+        {{loading ? '提交中...' : '提交食谱'}}
+      </button>
+    </view>
+  </scroll-view>
+</view>
