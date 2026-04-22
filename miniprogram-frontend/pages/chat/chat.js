@@ -23,8 +23,7 @@ Page({
       const defaultMessages = [
         {
           role: 'assistant',
-          //content: '你好！我是你的AI营养师，有什么可以帮助你的吗？'
-          content: 'AI问答功能正在维护中，敬请期待！'
+          content: '你好！我是你的AI营养师，有什么可以帮助你的吗？'
         }
       ];
       this.setData({
@@ -121,27 +120,7 @@ Page({
     app.globalData.chatMessages = newMessages;
 
     this.scrollToBottom();
-    //this.connectWebSocket(text);
-    wx.showToast({
-      title: 'AI问答功能正在维护中，敬请期待！',
-      icon: 'none',
-      duration: 2000
-    });
-    
-    setTimeout(() => {
-      const assistantMessage = {
-        role: 'assistant',
-        content: '抱歉，AI问答功能正在维护中，敬请期待！'
-      };
-      const updatedMessages = [...newMessages, assistantMessage];
-      this.setData({
-        messages: updatedMessages,
-        loading: false,
-        isStreaming: false
-      });
-      app.globalData.chatMessages = updatedMessages;
-      this.scrollToBottom();
-    }, 500);
+    this.connectWebSocket(text);
   },
 
   connectWebSocket(userMessage) {

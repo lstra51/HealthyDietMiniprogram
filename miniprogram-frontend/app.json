@@ -8,6 +8,7 @@
     "pages/recipe/detail/detail",
     "pages/health/health",
     "pages/record/record",
+    "pages/statistics/statistics",
     "pages/profile/profile",
     "pages/chat/chat",
     "pages/favorites/favorites"

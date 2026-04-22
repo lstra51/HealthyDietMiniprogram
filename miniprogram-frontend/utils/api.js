@@ -1,5 +1,5 @@
-const BASE_URL = 'https://health.cupk.space/api';
-// const BASE_URL = 'http://localhost:8080/api';
+// const BASE_URL = 'https://health.cupk.space/api';
+const BASE_URL = 'http://localhost:8080/api';
 
 
 function buildQueryParams(data) {

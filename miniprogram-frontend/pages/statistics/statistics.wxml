@@ -1,0 +1,64 @@
+<view class="page">
+  <view class="header">
+    <view class="title">营养数据统计</view>
+    <view class="tabs">
+      <view 
+        class="tab {{period === 'weekly' ? 'active' : ''}}" 
+        bindtap="switchPeriod" 
+        data-period="weekly">
+        近7天
+      </view>
+      <view 
+        class="tab {{period === 'monthly' ? 'active' : ''}}" 
+        bindtap="switchPeriod" 
+        data-period="monthly">
+        近30天
+      </view>
+    </view>
+  </view>
+
+  <view class="avg-section" wx:if="{{statistics}}">
+    <view class="avg-card">
+      <view class="avg-value">{{avgCaloriesDisplay}}</view>
+      <view class="avg-label">平均热量(kcal)</view>
+    </view>
+    <view class="avg-card">
+      <view class="avg-value">{{avgProteinDisplay}}</view>
+      <view class="avg-label">蛋白质(g)</view>
+    </view>
+    <view class="avg-card">
+      <view class="avg-value">{{avgCarbsDisplay}}</view>
+      <view class="avg-label">碳水(g)</view>
+    </view>
+    <view class="avg-card">
+      <view class="avg-value">{{avgFatDisplay}}</view>
+      <view class="avg-label">脂肪(g)</view>
+    </view>
+  </view>
+
+  <view class="chart-section">
+    <view class="section-title">热量摄入趋势</view>
+    <canvas 
+      type="2d" 
+      id="trendChart" 
+      class="trend-chart"
+      canvas-id="trendChart">
+    </canvas>
+  </view>
+
+  <view class="chart-section">
+    <view class="section-title">营养结构占比</view>
+    <canvas 
+      type="2d" 
+      id="pieChart" 
+      class="pie-chart"
+      canvas-id="pieChart">
+    </canvas>
+  </view>
+
+  <view class="empty-section" wx:if="{{!statistics || !statistics.trend}}">
+    <view class="empty-icon">📊</view>
+    <view class="empty-text">暂无统计数据</view>
+    <view class="empty-tip">先去记录饮食吧~</view>
+  </view>
+</view>

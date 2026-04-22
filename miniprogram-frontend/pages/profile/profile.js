@@ -115,6 +115,13 @@ Page({
     });
   },
 
+  goToStatistics() {
+    if (!this.checkNeedLogin()) return;
+    wx.navigateTo({
+      url: '/pages/statistics/statistics'
+    });
+  },
+
   goToRecord() {
     if (!this.checkNeedLogin()) return;
     wx.switchTab({
