@@ -5,6 +5,7 @@ Page({
   data: {
     recipe: null,
     showRecordModal: false,
+    showShareModal: false,
     mealType: '早餐',
     portion: 1,
     isFavorited: false
@@ -119,6 +120,162 @@ Page({
 
   hideAddRecordModal() {
     this.setData({ showRecordModal: false });
+  },
+
+  async showShareModal() {
+    this.setData({ showShareModal: true });
+    await this.drawPoster();
+  },
+
+  hideShareModal() {
+    this.setData({ showShareModal: false });
+  },
+
+  async drawPoster() {
+    const { recipe } = this.data;
+    if (!recipe) return;
+
+    const query = wx.createSelectorQuery();
+    query.select('#posterCanvas')
+      .fields({ node: true, size: true })
+      .exec(async (res) => {
+        if (!res[0]) return;
+        
+        const canvas = res[0].node;
+        const ctx = canvas.getContext('2d');
+        const dpr = wx.getSystemInfoSync().pixelRatio;
+        
+        canvas.width = res[0].width * dpr;
+        canvas.height = res[0].height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const width = res[0].width;
+        const height = res[0].height;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        try {
+          const img = canvas.createImage();
+          await new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+            img.src = recipe.image || 'https://via.placeholder.com/400';
+          });
+          ctx.drawImage(img, 0, 0, width, 300);
+        } catch (e) {
+          ctx.fillStyle = '#4CAF50';
+          ctx.fillRect(0, 0, width, 300);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '80px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('🥗', width / 2, 180);
+        }
+
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 32px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(recipe.name, 20, 350);
+
+        ctx.fillStyle = '#666';
+        ctx.font = '24px sans-serif';
+        ctx.fillText(`热量: ${recipe.calories}kcal`, 20, 390);
+
+        const cardY = 410;
+        const cardHeight = 60;
+        const cardWidth = (width - 60) / 3;
+
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillRect(20, cardY, cardWidth, cardHeight);
+        ctx.fillStyle = '#fff';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`蛋白质 ${recipe.protein}g`, 20 + cardWidth / 2, cardY + 38);
+
+        ctx.fillStyle = '#8BC34A';
+        ctx.fillRect(30 + cardWidth, cardY, cardWidth, cardHeight);
+        ctx.fillStyle = '#fff';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`碳水 ${recipe.carbs}g`, 30 + cardWidth + cardWidth / 2, cardY + 38);
+
+        ctx.fillStyle = '#FFC107';
+        ctx.fillRect(40 + cardWidth * 2, cardY, cardWidth, cardHeight);
+        ctx.fillStyle = '#fff';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`脂肪 ${recipe.fat}g`, 40 + cardWidth * 2 + cardWidth / 2, cardY + 38);
+
+        ctx.fillStyle = '#f5f5f5';
+        ctx.fillRect(0, height - 120, width, 120);
+        
+        ctx.fillStyle = '#4CAF50';
+        ctx.font = 'bold 28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('健康饮食推荐助手', width / 2, height - 65);
+        
+        ctx.fillStyle = '#999';
+        ctx.font = '20px sans-serif';
+        ctx.fillText('扫码查看更多食谱', width / 2, height - 30);
+      });
+  },
+
+  async savePoster() {
+    try {
+      const query = wx.createSelectorQuery();
+      query.select('#posterCanvas')
+        .fields({ node: true, size: true })
+        .exec(async (res) => {
+          if (!res[0]) return;
+          
+          const canvas = res[0].node;
+          wx.canvasToTempFilePath({
+            canvas: canvas,
+            success: (fileRes) => {
+              wx.saveImageToPhotosAlbum({
+                filePath: fileRes.tempFilePath,
+                success: () => {
+                  wx.showToast({
+                    title: '保存成功',
+                    icon: 'success'
+                  });
+                  this.hideShareModal();
+                },
+                fail: (err) => {
+                  if (err.errMsg.includes('auth deny')) {
+                    wx.showModal({
+                      title: '提示',
+                      content: '需要您授权保存图片到相册',
+                      confirmText: '去授权',
+                      success: (modalRes) => {
+                        if (modalRes.confirm) {
+                          wx.openSetting();
+                        }
+                      }
+                    });
+                  } else {
+                    wx.showToast({
+                      title: '保存失败',
+                      icon: 'none'
+                    });
+                  }
+                }
+              });
+            },
+            fail: () => {
+              wx.showToast({
+                title: '生成海报失败',
+                icon: 'none'
+              });
+            }
+          }, this);
+        });
+    } catch (e) {
+      wx.showToast({
+        title: '保存失败',
+        icon: 'none'
+      });
+    }
   },
 
   onMealTypeChange(e) {

@@ -55,6 +55,7 @@
   </view>
 
   <view class="fixed-bottom">
+    <button class="share-btn" bindtap="showShareModal">分享</button>
     <button class="add-record-btn" bindtap="showAddRecordModal">添加到饮食记录</button>
   </view>
 
@@ -79,6 +80,26 @@
     <view class="modal-footer">
       <button class="modal-btn cancel" bindtap="hideAddRecordModal">取消</button>
       <button class="modal-btn confirm" bindtap="addToRecord">确认</button>
+    </view>
+  </view>
+
+  <view class="modal-mask {{showShareModal ? 'show' : ''}}" bindtap="hideShareModal"></view>
+  <view class="modal share-modal {{showShareModal ? 'show' : ''}}" wx:if="{{showShareModal}}">
+    <view class="modal-header">
+      <view class="modal-title">生成分享海报</view>
+      <view class="modal-close" bindtap="hideShareModal">×</view>
+    </view>
+    <view class="modal-body">
+      <canvas 
+        type="2d" 
+        id="posterCanvas" 
+        class="poster-canvas"
+        canvas-id="posterCanvas">
+      </canvas>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn cancel" bindtap="hideShareModal">取消</button>
+      <button class="modal-btn confirm" bindtap="savePoster">保存到相册</button>
     </view>
   </view>
 </view>
