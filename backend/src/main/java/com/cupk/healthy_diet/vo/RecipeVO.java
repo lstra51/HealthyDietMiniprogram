@@ -16,4 +16,6 @@ public class RecipeVO {
     private String image;
     private Integer calories;
     private List<String> tags;
+    private String status;
+    private String rejectReason;
 }

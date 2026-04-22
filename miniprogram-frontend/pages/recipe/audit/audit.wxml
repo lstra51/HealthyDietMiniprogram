@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="header">待审核食谱</view>
+  
+  <view class="recipe-list" wx:if="{{recipeList.length > 0}}">
+    <view class="recipe-item" wx:for="{{recipeList}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <image class="recipe-image" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="recipe-info">
+        <view class="recipe-name">{{item.name}}</view>
+        <view class="recipe-category">{{item.category}}</view>
+        <view class="recipe-calories">{{item.calories}}千卡</view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:else>
+    <view class="empty-icon">📭</view>
+    <view class="empty-text">暂无可审核的食谱</view>
+  </view>
+</view>

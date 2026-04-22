@@ -44,6 +44,14 @@
           <view class="entry-icon">📖</view>
           <view class="entry-label">浏览食谱</view>
         </view>
+        <view class="entry-item" bindtap="goToCreateRecipe">
+          <view class="entry-icon">➕</view>
+          <view class="entry-label">上传食谱</view>
+        </view>
+        <view class="entry-item" bindtap="goToMyRecipes">
+          <view class="entry-icon">📋</view>
+          <view class="entry-label">我的食谱</view>
+        </view>
         <view class="entry-item" bindtap="goToHealth">
           <view class="entry-icon">{{isLoggedIn && healthInfoFilled ? '✅' : '📝'}}</view>
           <view class="entry-label">{{isLoggedIn && healthInfoFilled ? '修改健康信息' : '填写健康信息'}}</view>
@@ -55,6 +63,10 @@
         <view class="entry-item" bindtap="goToChat">
           <view class="entry-icon">🤖</view>
           <view class="entry-label">AI营养师</view>
+        </view>
+        <view class="entry-item" wx:if="{{isAdmin}}" bindtap="goToAudit">
+          <view class="entry-icon">🔍</view>
+          <view class="entry-label">审核食谱</view>
         </view>
       </view>
     </view>

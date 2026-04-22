@@ -44,9 +44,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("user");
         this.save(user);
 
-        return new UserVO(user.getId(), user.getUsername(), null, null);
+        return new UserVO(user.getId(), user.getUsername(), null, null, user.getRole());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("密码错误");
         }
 
-        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl());
+        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl(), user.getRole());
     }
 
     @Override
@@ -79,6 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setOpenid(openid);
             user.setNickname(request.getNickname());
             user.setAvatarUrl(request.getAvatarUrl());
+            user.setRole("user");
             this.save(user);
         } else {
             user.setNickname(request.getNickname());
@@ -86,7 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             this.updateById(user);
         }
 
-        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl());
+        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl(), user.getRole());
     }
 
     private String getWechatOpenid(String code) {

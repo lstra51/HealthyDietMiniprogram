@@ -4,7 +4,7 @@ const api = require('../../../utils/api.js');
 Page({
   data: {
     recipes: [],
-    categories: ['全部', '蔬菜', '肉类', '海鲜', '主食'],
+    categories: ['全部', '蔬菜', '肉类', '海鲜', '主食', '汤'],
     activeCategory: '全部',
     searchKeyword: '',
     filteredRecipes: []

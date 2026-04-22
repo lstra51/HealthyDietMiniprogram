@@ -8,7 +8,8 @@ Page({
     healthInfoFilled: false,
     userName: '',
     currentDate: '',
-    isLoggedIn: false
+    isLoggedIn: false,
+    isAdmin: false
   },
 
   onLoad() {
@@ -50,7 +51,8 @@ Page({
     if (isLoggedIn && app.globalData.userInfo) {
       const userInfo = app.globalData.userInfo;
       const displayName = userInfo.nickname || userInfo.username || '用户';
-      this.setData({ userName: displayName });
+      const isAdmin = userInfo.role === 'admin';
+      this.setData({ userName: displayName, isAdmin });
     }
   },
 
@@ -140,6 +142,27 @@ Page({
   goToLogin() {
     wx.navigateTo({
       url: '/pages/auth/login/login'
+    });
+  },
+
+  goToCreateRecipe() {
+    if (!this.checkNeedLogin()) return;
+    wx.navigateTo({
+      url: '/pages/recipe/create/create'
+    });
+  },
+
+  goToAudit() {
+    if (!this.checkNeedLogin()) return;
+    wx.navigateTo({
+      url: '/pages/recipe/audit/audit'
+    });
+  },
+
+  goToMyRecipes() {
+    if (!this.checkNeedLogin()) return;
+    wx.navigateTo({
+      url: '/pages/recipe/my-recipes/my-recipes'
     });
   }
 });

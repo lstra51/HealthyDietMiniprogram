@@ -1,5 +1,5 @@
-// const BASE_URL = 'https://health.cupk.space/api';
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = 'https://health.cupk.space/api';
+// const BASE_URL = 'http://localhost:8080/api';
 
 
 function buildQueryParams(data) {
@@ -111,6 +111,32 @@ function streamRequest(url, data, callbacks) {
   };
 }
 
+function uploadFile(url, filePath, formData) {
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: BASE_URL + url,
+      filePath: filePath,
+      name: 'file',
+      formData: formData,
+      success: (res) => {
+        if (res.statusCode === 200) {
+          try {
+            const data = JSON.parse(res.data);
+            resolve(data);
+          } catch (e) {
+            resolve(res.data);
+          }
+        } else {
+          reject(new Error('上传失败'));
+        }
+      },
+      fail: (err) => {
+        reject(err);
+      }
+    });
+  });
+}
+
 module.exports = {
   get(url, data) {
     return request(url, 'GET', data);
@@ -124,5 +150,6 @@ module.exports = {
   delete(url, data) {
     return request(url, 'DELETE', data);
   },
-  streamRequest
+  streamRequest,
+  uploadFile
 };

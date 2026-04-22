@@ -21,6 +21,8 @@ public class User {
 
     private String avatarUrl;
 
+    private String role;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
