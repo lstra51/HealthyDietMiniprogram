@@ -54,6 +54,15 @@
       class="pie-chart"
       canvas-id="pieChart">
     </canvas>
+    <view class="pie-legend" wx:if="{{pieLegend.length > 0}}">
+      <view class="legend-item" wx:for="{{pieLegend}}" wx:key="name">
+        <view class="legend-dot" style="background-color: {{item.color}};"></view>
+        <view class="legend-text">
+          <view class="legend-name">{{item.name}}</view>
+          <view class="legend-percent">{{item.percentageText}}</view>
+        </view>
+      </view>
+    </view>
   </view>
 
   <view class="empty-section" wx:if="{{!statistics || !statistics.trend}}">

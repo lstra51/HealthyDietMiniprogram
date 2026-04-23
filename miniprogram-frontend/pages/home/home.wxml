@@ -64,6 +64,10 @@
           <view class="entry-icon">🤖</view>
           <view class="entry-label">AI营养师</view>
         </view>
+        <view class="entry-item" bindtap="goToDishRecognition">
+          <view class="entry-icon">📷</view>
+          <view class="entry-label">拍照识别</view>
+        </view>
         <view class="entry-item" wx:if="{{isAdmin}}" bindtap="goToAudit">
           <view class="entry-icon">🔍</view>
           <view class="entry-label">审核食谱</view>

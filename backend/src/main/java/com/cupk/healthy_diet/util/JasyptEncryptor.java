@@ -3,8 +3,8 @@ package com.cupk.healthy_diet.util;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 public class JasyptEncryptor {
-    private static final String ALGORITHM = "PBEWithMD5AndDES";
-    private static final String PASSWORD = "healthy-diet-miniprogram-secret-key-2024";
+    private static final String ALGORITHM = System.getenv().getOrDefault("JASYPT_ENCRYPTOR_ALGORITHM", "PBEWithMD5AndDES");
+    private static final String PASSWORD = System.getenv().getOrDefault("JASYPT_ENCRYPTOR_PASSWORD", "change-me-local-only");
 
     public static String encrypt(String plainText) {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
@@ -45,4 +45,3 @@ public class JasyptEncryptor {
         }
     }
 }
-

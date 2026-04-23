@@ -4,9 +4,12 @@ import com.cupk.healthy_diet.common.Result;
 import com.cupk.healthy_diet.dto.CreateRecipeDTO;
 import com.cupk.healthy_diet.dto.RecipeImportDTO;
 import com.cupk.healthy_diet.dto.RejectRecipeDTO;
+import com.cupk.healthy_diet.exception.BusinessException;
+import com.cupk.healthy_diet.security.AuthContext;
 import com.cupk.healthy_diet.service.RecipeService;
 import com.cupk.healthy_diet.vo.RecipeDetailVO;
 import com.cupk.healthy_diet.vo.RecipeVO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,17 +39,16 @@ public class RecipeController {
     }
 
     @PostMapping("/import")
-    public Result<Void> importRecipes(@RequestBody List<RecipeImportDTO> recipeDTOs) {
+    public Result<Void> importRecipes(@Valid @RequestBody List<RecipeImportDTO> recipeDTOs,
+                                      @RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
         recipeService.importRecipes(recipeDTOs);
         return Result.success();
     }
 
     @PostMapping
-    public Result<Map<String, Object>> createRecipe(@RequestBody CreateRecipeDTO dto,
-                                                    @RequestAttribute(required = false) Integer userId) {
-        if (userId == null) {
-            userId = 1;
-        }
+    public Result<Map<String, Object>> createRecipe(@Valid @RequestBody CreateRecipeDTO dto,
+                                                    @RequestAttribute(AuthContext.USER_ID) Integer userId) {
         Integer recipeId = recipeService.createRecipe(dto, userId);
         Map<String, Object> result = new HashMap<>();
         result.put("id", recipeId);
@@ -55,40 +57,46 @@ public class RecipeController {
     }
 
     @GetMapping("/pending")
-    public Result<List<RecipeVO>> getPendingRecipes() {
+    public Result<List<RecipeVO>> getPendingRecipes(@RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
         List<RecipeVO> recipes = recipeService.getPendingRecipes();
         return Result.success(recipes);
     }
 
     @PutMapping("/{id}/approve")
-    public Result<Void> approveRecipe(@PathVariable Integer id) {
+    public Result<Void> approveRecipe(@PathVariable Integer id,
+                                      @RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
         recipeService.approveRecipe(id);
         return Result.success();
     }
 
     @PutMapping("/{id}/reject")
-    public Result<Void> rejectRecipe(@PathVariable Integer id, @RequestBody RejectRecipeDTO dto) {
+    public Result<Void> rejectRecipe(@PathVariable Integer id,
+                                     @Valid @RequestBody RejectRecipeDTO dto,
+                                     @RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
         recipeService.rejectRecipe(id, dto.getReason());
         return Result.success();
     }
 
     @GetMapping("/user")
-    public Result<List<RecipeVO>> getUserRecipes(@RequestAttribute(required = false) Integer userId) {
-        if (userId == null) {
-            userId = 1;
-        }
+    public Result<List<RecipeVO>> getUserRecipes(@RequestAttribute(AuthContext.USER_ID) Integer userId) {
         List<RecipeVO> recipes = recipeService.getUserRecipes(userId);
         return Result.success(recipes);
     }
 
     @PutMapping("/{id}")
     public Result<Void> updateRecipe(@PathVariable Integer id,
-                                     @RequestBody CreateRecipeDTO dto,
-                                     @RequestAttribute(required = false) Integer userId) {
-        if (userId == null) {
-            userId = 1;
-        }
+                                     @Valid @RequestBody CreateRecipeDTO dto,
+                                     @RequestAttribute(AuthContext.USER_ID) Integer userId) {
         recipeService.updateRecipe(id, dto, userId);
         return Result.success();
+    }
+
+    private void requireAdmin(String role) {
+        if (!AuthContext.isAdmin(role)) {
+            throw new BusinessException(403, "需要管理员权限");
+        }
     }
 }

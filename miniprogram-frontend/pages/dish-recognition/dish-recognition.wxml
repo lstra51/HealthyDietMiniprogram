@@ -1,0 +1,49 @@
+<view class="page">
+  <view class="preview-section">
+    <image wx:if="{{imagePath}}" class="preview-image" src="{{imagePath}}" mode="aspectFill" />
+    <view wx:else class="empty-preview">
+      <view class="empty-icon">📷</view>
+      <view class="empty-title">拍照识别菜品营养</view>
+      <view class="empty-desc">选择一张清晰的菜品照片，识别结果会给出参考热量</view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="action-btn primary" bindtap="chooseFromCamera" loading="{{loading}}" disabled="{{loading}}">拍照识别</button>
+    <button class="action-btn secondary" bindtap="chooseFromAlbum" loading="{{loading}}" disabled="{{loading}}">从相册选择</button>
+  </view>
+
+  <view class="error-card" wx:if="{{errorText}}">
+    <view class="error-title">暂时没有拿到识别结果</view>
+    <view class="error-text">{{errorText}}</view>
+  </view>
+
+  <view class="result-section" wx:if="{{result}}">
+    <view class="result-card">
+      <view class="result-header">
+        <view>
+          <view class="result-title">{{result.bestName}}</view>
+          <view class="result-subtitle">最佳匹配</view>
+        </view>
+        <view class="confidence">{{bestProbabilityText}}</view>
+      </view>
+      <view class="calorie-row">
+        <view class="calorie-value">{{result.bestCalories || '暂无'}}</view>
+        <view class="calorie-label">参考热量 kcal/100g</view>
+      </view>
+    </view>
+
+    <view class="candidate-card">
+      <view class="section-title">候选结果</view>
+      <view class="candidate-item" wx:for="{{result.items}}" wx:key="name">
+        <view class="candidate-name">{{item.name}}</view>
+        <view class="candidate-meta">
+          <text>{{item.calorie || '暂无热量'}} kcal/100g</text>
+          <text>{{item.probabilityText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="hint">识别热量来自第三方接口，仅作饮食记录参考；实际摄入还需要结合份量估算。</view>
+  </view>
+</view>

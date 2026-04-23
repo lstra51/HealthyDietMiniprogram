@@ -16,7 +16,7 @@ Page({
   loadDetail() {
     api.get(`/recipes/${this.data.id}`).then(res => {
       if (res.code === 200) {
-        this.setData({ recipe: res.data });
+        this.setData({ recipe: api.formatRecipeImage(res.data) });
       }
     });
   },

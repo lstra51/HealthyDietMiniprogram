@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     openid VARCHAR(100) UNIQUE COMMENT '微信用户唯一标识',
     nickname VARCHAR(100) COMMENT '微信昵称',
     avatar_url VARCHAR(500) COMMENT '微信头像',
+    role VARCHAR(20) DEFAULT 'user' COMMENT '角色：user普通用户/admin管理员',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -40,8 +41,15 @@ CREATE TABLE IF NOT EXISTS recipes (
     protein DECIMAL(6,2) NOT NULL,
     carbs DECIMAL(6,2) NOT NULL,
     fat DECIMAL(6,2) NOT NULL,
+    user_id INT COMMENT '上传用户ID，NULL表示官方食谱',
+    status VARCHAR(20) DEFAULT 'approved' COMMENT '状态：pending待审核/approved已通过/rejected已拒绝',
+    reject_reason TEXT COMMENT '审核拒绝原因',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_category (category),
+    INDEX idx_status (status),
+    INDEX idx_user_id (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- 食谱食材表

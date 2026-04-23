@@ -139,6 +139,13 @@ Page({
     });
   },
 
+  goToDishRecognition() {
+    if (!this.checkNeedLogin()) return;
+    wx.navigateTo({
+      url: '/pages/dish-recognition/dish-recognition'
+    });
+  },
+
   goToLogin() {
     wx.navigateTo({
       url: '/pages/auth/login/login'

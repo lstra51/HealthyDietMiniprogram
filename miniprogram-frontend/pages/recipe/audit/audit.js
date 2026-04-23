@@ -16,7 +16,7 @@ Page({
   loadRecipes() {
     api.get('/recipes/pending').then(res => {
       if (res.code === 200) {
-        this.setData({ recipeList: res.data });
+        this.setData({ recipeList: api.formatRecipeImages(res.data) });
       }
     });
   },

@@ -45,15 +45,21 @@ public class RecommendationServiceImpl implements RecommendationService {
         // 将结果传递给验证器进行日志输出
         recommendationValidator.validateAndLog(userId, ruleScores, contentScores, cfScores);
 
+        Map<Integer, ScoreBreakdown> breakdownMap = new HashMap<>();
         List<RecipeScore> finalScores;
 
         if (isNewUser) {
-            finalScores = handleColdStart(healthInfo, ruleScores, contentScores);
+            mergeBreakdown(breakdownMap, ruleScores, "rule");
+            mergeBreakdown(breakdownMap, contentScores, "content");
+            finalScores = handleColdStart(healthInfo, ruleScores, contentScores, breakdownMap);
         } else {
+            mergeBreakdown(breakdownMap, ruleScores, "rule");
+            mergeBreakdown(breakdownMap, contentScores, "content");
+            mergeBreakdown(breakdownMap, cfScores, "cf");
             finalScores = hybridRecommend(ruleScores, contentScores, cfScores);
         }
 
-        List<RecommendationVO> recommendations = convertToVO(finalScores, healthInfo);
+        List<RecommendationVO> recommendations = convertToVO(finalScores, healthInfo, breakdownMap);
 
         List<Integer> recipeIds = recommendations.stream()
                 .map(RecommendationVO::getRecipeId)
@@ -63,8 +69,9 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendations;
     }
 
-    private List<RecipeScore> handleColdStart(HealthInfo healthInfo, List<RecipeScore> ruleScores, List<RecipeScore> contentScores) {
+    private List<RecipeScore> handleColdStart(HealthInfo healthInfo, List<RecipeScore> ruleScores, List<RecipeScore> contentScores, Map<Integer, ScoreBreakdown> breakdownMap) {
         List<RecipeScore> hotScores = getHotRecommendations();
+        mergeBreakdown(breakdownMap, hotScores, "cf");
 
         Map<Integer, Double> scoreMap = new HashMap<>();
 
@@ -116,18 +123,24 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     private List<RecipeScore> buildRecipeScores(Map<Integer, Double> scoreMap) {
+        if (scoreMap.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Integer> ids = new ArrayList<>(scoreMap.keySet());
+        Map<Integer, Recipe> recipes = recipeMapper.selectBatchIds(ids).stream()
+                .collect(Collectors.toMap(Recipe::getId, recipe -> recipe));
+
         return scoreMap.entrySet().stream()
-                .map(entry -> {
-                    Recipe recipe = recipeMapper.selectById(entry.getKey());
-                    return recipe != null ? new RecipeScore(recipe, entry.getValue()) : null;
-                })
+                .map(entry -> recipes.containsKey(entry.getKey())
+                        ? new RecipeScore(recipes.get(entry.getKey()), entry.getValue())
+                        : null)
                 .filter(Objects::nonNull)
                 .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
                 .limit(TOP_N)
                 .collect(Collectors.toList());
     }
 
-    private List<RecommendationVO> convertToVO(List<RecipeScore> scores, HealthInfo healthInfo) {
+    private List<RecommendationVO> convertToVO(List<RecipeScore> scores, HealthInfo healthInfo, Map<Integer, ScoreBreakdown> breakdownMap) {
         List<RecommendationVO> result = new ArrayList<>();
         double bmi = healthInfo != null && healthInfo.getHeight() != null && healthInfo.getWeight() != null
                 ? healthInfo.getWeight() / ((healthInfo.getHeight() / 100.0) * (healthInfo.getHeight() / 100.0))
@@ -145,18 +158,53 @@ public class RecommendationServiceImpl implements RecommendationService {
             vo.setCarbs(recipe.getCarbs());
             vo.setFat(recipe.getFat());
             vo.setScore(Math.round(rs.getScore() * 100.0) / 100.0);
-            vo.setReason(generateReason(healthInfo, bmi));
+            ScoreBreakdown breakdown = breakdownMap.getOrDefault(recipe.getId(), new ScoreBreakdown());
+            vo.setRuleScore(round(breakdown.ruleScore));
+            vo.setContentScore(round(breakdown.contentScore));
+            vo.setCollaborativeScore(round(breakdown.collaborativeScore));
+            vo.setReason(generateReason(recipe, healthInfo, bmi, breakdown));
             result.add(vo);
         }
 
         return result;
     }
 
-    private String generateReason(HealthInfo healthInfo, double bmi) {
+    private String generateReason(Recipe recipe, HealthInfo healthInfo, double bmi, ScoreBreakdown breakdown) {
         if (healthInfo != null && healthInfo.getGoal() != null) {
-            String bmiStr = String.format("%.1f", bmi);
-            return String.format("根据您的 BMI(%s) 和%s目标智能推荐", bmiStr, healthInfo.getGoal());
+            if ("减脂".equals(healthInfo.getGoal()) && recipe.getCalories() != null && recipe.getCalories() <= 500) {
+                return "低热量食谱，匹配您的减脂目标";
+            }
+            if ("增肌".equals(healthInfo.getGoal()) && recipe.getProtein() != null && recipe.getProtein() >= 20) {
+                return "高蛋白食谱，适合您的增肌目标";
+            }
+            if (breakdown.collaborativeScore > 0) {
+                return "结合您的浏览和收藏行为推荐";
+            }
+            return String.format("根据您的 BMI(%.1f) 和%s目标推荐", bmi, healthInfo.getGoal());
         }
         return "热门推荐";
+    }
+
+    private void mergeBreakdown(Map<Integer, ScoreBreakdown> breakdownMap, List<RecipeScore> scores, String source) {
+        for (RecipeScore score : scores) {
+            ScoreBreakdown breakdown = breakdownMap.computeIfAbsent(score.getRecipe().getId(), id -> new ScoreBreakdown());
+            switch (source) {
+                case "rule" -> breakdown.ruleScore = Math.max(breakdown.ruleScore, score.getScore());
+                case "content" -> breakdown.contentScore = Math.max(breakdown.contentScore, score.getScore());
+                case "cf" -> breakdown.collaborativeScore = Math.max(breakdown.collaborativeScore, score.getScore());
+                default -> {
+                }
+            }
+        }
+    }
+
+    private double round(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+    private static class ScoreBreakdown {
+        double ruleScore = 0.0;
+        double contentScore = 0.0;
+        double collaborativeScore = 0.0;
     }
 }

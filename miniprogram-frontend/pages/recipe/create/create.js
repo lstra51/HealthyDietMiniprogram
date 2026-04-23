@@ -34,7 +34,7 @@ Page({
         this.setData({
           name: recipe.name,
           category: recipe.category,
-          image: recipe.image,
+          image: api.formatImageUrl(recipe.image),
           description: recipe.description,
           calories: recipe.calories,
           protein: recipe.protein,

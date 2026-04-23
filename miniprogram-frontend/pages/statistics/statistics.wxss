@@ -86,7 +86,55 @@
 
 .pie-chart {
   width: 100%;
-  height: 400rpx;
+  height: 340rpx;
+}
+
+.pie-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+
+.legend-dot {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 12rpx;
+}
+
+.legend-text {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8rpx;
+  flex: 1;
+}
+
+.legend-name {
+  font-size: 24rpx;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-percent {
+  font-size: 24rpx;
+  color: #666;
+  flex-shrink: 0;
 }
 
 .empty-section {

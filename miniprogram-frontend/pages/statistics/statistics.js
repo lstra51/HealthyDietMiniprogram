@@ -7,6 +7,7 @@ Page({
     statistics: null,
     trendChart: null,
     pieChart: null,
+    pieLegend: [],
     avgCaloriesDisplay: '0',
     avgProteinDisplay: '0.0',
     avgCarbsDisplay: '0.0',
@@ -69,7 +70,8 @@ Page({
         avgCaloriesDisplay: '0',
         avgProteinDisplay: '0.0',
         avgCarbsDisplay: '0.0',
-        avgFatDisplay: '0.0'
+        avgFatDisplay: '0.0',
+        pieLegend: []
       });
       return;
     }
@@ -79,11 +81,19 @@ Page({
     const avgCarbs = stats.avgCarbs || 0;
     const avgFat = stats.avgFat || 0;
 
+    const colors = ['#4CAF50', '#8BC34A', '#FFC107'];
+    const pieLegend = (stats.pieData || []).map((item, index) => ({
+      name: item.name,
+      color: colors[index] || '#4CAF50',
+      percentageText: (item.percentage || 0).toFixed(1) + '%'
+    }));
+
     this.setData({
       avgCaloriesDisplay: avgCalories.toFixed(0),
       avgProteinDisplay: avgProtein.toFixed(1),
       avgCarbsDisplay: avgCarbs.toFixed(1),
-      avgFatDisplay: avgFat.toFixed(1)
+      avgFatDisplay: avgFat.toFixed(1),
+      pieLegend
     });
   },
 
@@ -230,19 +240,6 @@ Page({
           ctx.fill();
 
           startAngle = endAngle;
-        });
-
-        const legendY = height - 25;
-        pieData.forEach((item, i) => {
-          const legendX = 20 + i * (width / 3);
-          
-          ctx.fillStyle = colors[i];
-          ctx.fillRect(legendX, legendY, 12, 12);
-          
-          ctx.fillStyle = '#333';
-          ctx.font = '12px sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillText(`${item.name} ${item.percentage.toFixed(1)}%`, legendX + 18, legendY + 10);
         });
       });
   }

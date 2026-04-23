@@ -24,7 +24,7 @@ Page({
       wx.hideLoading();
       
       if (res.code === 200) {
-        var recipe = res.data;
+        var recipe = api.formatRecipeImage(res.data);
         wx.setNavigationBarTitle({ title: recipe.name });
         this.setData({ recipe: recipe });
         
@@ -160,7 +160,7 @@ Page({
           await new Promise((resolve) => {
             img.onload = resolve;
             img.onerror = resolve;
-            img.src = recipe.image || 'https://via.placeholder.com/400';
+            img.src = api.formatImageUrl(recipe.image) || 'https://via.placeholder.com/400';
           });
           ctx.drawImage(img, 0, 0, width, 300);
         } catch (e) {
@@ -309,20 +309,17 @@ Page({
     wx.showLoading({ title: '保存中...' });
 
     try {
-      var recordDate = new Date().toISOString().split('T')[0];
-      var protein = (recipe.protein * portion).toFixed(2);
-      var carbs = (recipe.carbs * portion).toFixed(2);
-      var fat = (recipe.fat * portion).toFixed(2);
+      var recordDate = app.formatLocalDate(new Date());
       var res = await api.post('/records', {
         userId: userId,
         recipeId: recipe.id,
         recipeName: recipe.name,
         mealType: mealType,
         portion: portion,
-        calories: Math.round(recipe.calories * portion),
-        protein: protein,
-        carbs: carbs,
-        fat: fat,
+        calories: recipe.calories,
+        protein: recipe.protein,
+        carbs: recipe.carbs,
+        fat: recipe.fat,
         recordDate: recordDate
       });
 

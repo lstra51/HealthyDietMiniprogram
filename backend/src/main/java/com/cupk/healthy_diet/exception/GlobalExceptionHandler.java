@@ -3,6 +3,7 @@ package com.cupk.healthy_diet.exception;
 import com.cupk.healthy_diet.common.Result;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -18,8 +19,13 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public Result<Void> handleBusinessException(BusinessException e) {
+    public Result<Void> handleBusinessException(BusinessException e, HttpServletResponse response) {
         log.warn("业务异常: {}", e.getMessage());
+        if (e.getCode() == 401) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        } else if (e.getCode() == 403) {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+        }
         return Result.error(e.getCode(), e.getMessage());
     }
 
