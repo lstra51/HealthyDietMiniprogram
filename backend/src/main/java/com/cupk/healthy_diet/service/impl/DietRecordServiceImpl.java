@@ -87,12 +87,18 @@ public class DietRecordServiceImpl extends ServiceImpl<DietRecordMapper, DietRec
     public DailyNutritionVO getDailyNutrition(Integer userId, String date) {
         List<DietRecordVO> records = getDietRecordsByUserIdAndDate(userId, date);
 
-        int totalCalories = records.stream().mapToInt(DietRecordVO::getCalories).sum();
-        double totalProtein = records.stream().mapToDouble(DietRecordVO::getProtein).sum();
-        double totalCarbs = records.stream().mapToDouble(DietRecordVO::getCarbs).sum();
-        double totalFat = records.stream().mapToDouble(DietRecordVO::getFat).sum();
+        int totalCalories = records.stream()
+                .mapToInt(record -> (int) Math.round(record.getCalories() * getPortion(record)))
+                .sum();
+        double totalProtein = records.stream().mapToDouble(record -> record.getProtein() * getPortion(record)).sum();
+        double totalCarbs = records.stream().mapToDouble(record -> record.getCarbs() * getPortion(record)).sum();
+        double totalFat = records.stream().mapToDouble(record -> record.getFat() * getPortion(record)).sum();
 
         return new DailyNutritionVO(totalCalories, totalProtein, totalCarbs, totalFat);
+    }
+
+    private double getPortion(DietRecordVO record) {
+        return record.getPortion() != null ? record.getPortion() : 1.0;
     }
 
     private DietRecordVO convertToVO(DietRecord record) {

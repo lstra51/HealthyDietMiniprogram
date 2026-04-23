@@ -32,6 +32,10 @@ backend/src/main/resources/application-*.yaml
 # 后端 - 编译输出
 backend/target/
 
+# 后端 - 用户上传文件
+backend/uploads/
+backend/src/main/resources/FoodImages/
+
 # 前端 - 小程序相关
 miniprogram-frontend/node_modules/
 miniprogram-frontend/.DS_Store

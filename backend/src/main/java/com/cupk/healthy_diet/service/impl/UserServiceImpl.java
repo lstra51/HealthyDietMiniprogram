@@ -9,6 +9,7 @@ import com.cupk.healthy_diet.dto.WechatLoginRequest;
 import com.cupk.healthy_diet.entity.User;
 import com.cupk.healthy_diet.exception.BusinessException;
 import com.cupk.healthy_diet.mapper.UserMapper;
+import com.cupk.healthy_diet.security.AuthTokenManager;
 import com.cupk.healthy_diet.service.UserService;
 import com.cupk.healthy_diet.vo.UserVO;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,6 +29,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final WechatConfig wechatConfig;
+    private final AuthTokenManager authTokenManager;
     private final OkHttpClient okHttpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,7 +49,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setRole("user");
         this.save(user);
 
-        return new UserVO(user.getId(), user.getUsername(), null, null, user.getRole());
+        return toUserVO(user);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("密码错误");
         }
 
-        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl(), user.getRole());
+        return toUserVO(user);
     }
 
     @Override
@@ -88,7 +90,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             this.updateById(user);
         }
 
-        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl(), user.getRole());
+        return toUserVO(user);
+    }
+
+    private UserVO toUserVO(User user) {
+        String token = authTokenManager.createToken(user.getId(), user.getRole());
+        return new UserVO(user.getId(), user.getUsername(), user.getNickname(), user.getAvatarUrl(), user.getRole(), token);
     }
 
     private String getWechatOpenid(String code) {

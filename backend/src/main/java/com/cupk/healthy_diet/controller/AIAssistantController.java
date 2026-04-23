@@ -2,6 +2,7 @@ package com.cupk.healthy_diet.controller;
 
 import com.cupk.healthy_diet.common.Result;
 import com.cupk.healthy_diet.dto.ChatRequest;
+import com.cupk.healthy_diet.security.AuthContext;
 import com.cupk.healthy_diet.service.SparkChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -23,9 +24,10 @@ public class AIAssistantController {
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
     @PostMapping("/chat")
-    public Result<String> chat(@RequestBody ChatRequest request) {
+    public Result<String> chat(@RequestBody ChatRequest request,
+                               @RequestAttribute(AuthContext.USER_ID) Integer userId) {
         String response = sparkChatService.chat(
-            request.getUserId(),
+            userId,
             request.getMessage(),
             (List<Map<String, String>>) (List<?>) request.getHistory()
         );
@@ -33,13 +35,14 @@ public class AIAssistantController {
     }
 
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter streamChat(@RequestBody ChatRequest request) {
+    public SseEmitter streamChat(@RequestBody ChatRequest request,
+                                 @RequestAttribute(AuthContext.USER_ID) Integer userId) {
         SseEmitter emitter = new SseEmitter(60000L);
         
         executor.execute(() -> {
             try {
                 sparkChatService.streamChat(
-                    request.getUserId(),
+                    userId,
                     request.getMessage(),
                     (List<Map<String, String>>) (List<?>) request.getHistory(),
                     new SparkChatService.StreamCallback() {

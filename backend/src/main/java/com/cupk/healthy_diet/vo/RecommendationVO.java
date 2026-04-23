@@ -18,4 +18,7 @@ public class RecommendationVO {
     private Double fat;
     private Double score;
     private String reason;
+    private Double ruleScore;
+    private Double contentScore;
+    private Double collaborativeScore;
 }

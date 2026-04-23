@@ -112,7 +112,7 @@ Page({
     this.setData({
       messages: newMessages,
       inputText: '',
-      loading: false,
+      loading: true,
       canSend: false,
       isStreaming: true,
       currentAssistantMessage: ''
@@ -125,42 +125,32 @@ Page({
 
   connectWebSocket(userMessage) {
     const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
+    const token = app.globalData.userInfo && app.globalData.userInfo.token ? app.globalData.userInfo.token : '';
     const history = this.data.messages.slice(0, -1).map(msg => ({
       role: msg.role,
       content: msg.content
     }));
 
-    const socketUrl = 'ws://localhost:8080/api/ai/chat/ws';
-    
+    const socketUrl = api.BASE_URL
+      .replace(/^https:/, 'wss:')
+      .replace(/^http:/, 'ws:') + '/ai/chat/ws?token=' + encodeURIComponent(token);
+
     const socketTask = wx.connectSocket({
       url: socketUrl,
-      protocols: [],
-      success: () => {
-        console.log('WebSocket连接成功');
-      },
-      fail: (err) => {
-        console.error('WebSocket连接失败', err);
+      fail: () => {
         this.sendMessageFallback(userMessage);
       }
     });
 
     socketTask.onOpen(() => {
-      console.log('WebSocket连接已打开');
-      
-      const requestData = {
-        userId: userId,
-        message: userMessage,
-        history: history
-      };
-      
       socketTask.send({
-        data: JSON.stringify(requestData),
-        success: () => {
-          console.log('消息发送成功');
-        },
-        fail: (err) => {
-          console.error('消息发送失败', err);
-          this.handleError();
+        data: JSON.stringify({
+          userId,
+          message: userMessage,
+          history
+        }),
+        fail: () => {
+          this.sendMessageFallback(userMessage);
         }
       });
     });
@@ -168,51 +158,60 @@ Page({
     socketTask.onMessage((res) => {
       try {
         const data = JSON.parse(res.data);
-        
         if (data.type === 'message') {
-          this.setData({
-            currentAssistantMessage: this.data.currentAssistantMessage + data.content
-          });
-          
-          const tempMessages = [...this.data.messages];
-          if (tempMessages.length > 0 && tempMessages[tempMessages.length - 1].role === 'assistant') {
-            tempMessages[tempMessages.length - 1].content = this.data.currentAssistantMessage;
-          } else {
-            tempMessages.push({
-              role: 'assistant',
-              content: this.data.currentAssistantMessage
-            });
-          }
-          
-          this.setData({
-            messages: tempMessages
-          });
-          app.globalData.chatMessages = tempMessages;
+          this.appendAssistantContent(data.content || '');
         } else if (data.type === 'complete') {
           this.handleComplete();
           this.scrollToBottom();
         } else if (data.type === 'error') {
-          console.error('AI错误:', data.content);
-          this.handleError(data.content);
+          this.handleError(data.content || '发送失败，请重试');
         }
       } catch (e) {
-        console.error('解析消息失败', e);
+        this.handleError('解析消息失败');
       }
     });
 
-    socketTask.onError((err) => {
-      console.error('WebSocket错误', err);
-      this.handleError();
+    socketTask.onError(() => {
+      if (this.data.isStreaming) {
+        this.sendMessageFallback(userMessage);
+      }
     });
 
     socketTask.onClose(() => {
-      console.log('WebSocket连接已关闭');
-      this.handleComplete();
+      if (this.data.isStreaming && this.data.currentAssistantMessage) {
+        this.handleComplete();
+      }
     });
 
     this.setData({
       socketTask: socketTask
     });
+  },
+
+  appendAssistantContent(content) {
+    if (!content) return;
+    if (this.data.loading) {
+      this.setData({ loading: false });
+    }
+    this.setData({
+      currentAssistantMessage: this.data.currentAssistantMessage + content
+    });
+
+    const tempMessages = [...this.data.messages];
+    if (tempMessages.length > 0 && tempMessages[tempMessages.length - 1].role === 'assistant') {
+      tempMessages[tempMessages.length - 1].content = this.data.currentAssistantMessage;
+    } else {
+      tempMessages.push({
+        role: 'assistant',
+        content: this.data.currentAssistantMessage
+      });
+    }
+
+    this.setData({
+      messages: tempMessages
+    });
+    app.globalData.chatMessages = tempMessages;
+    this.scrollToBottom();
   },
 
   handleComplete() {
@@ -240,7 +239,11 @@ Page({
 
   closeSocket() {
     if (this.data.socketTask) {
-      this.data.socketTask.close();
+      if (this.data.socketTask.abort) {
+        this.data.socketTask.abort();
+      } else if (this.data.socketTask.close) {
+        this.data.socketTask.close();
+      }
       this.setData({
         socketTask: null
       });

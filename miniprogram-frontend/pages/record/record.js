@@ -75,7 +75,7 @@ Page({
     }
     if (!userId) return;
 
-    var today = new Date().toISOString().split('T')[0];
+    var today = app.formatLocalDate(new Date());
     
     wx.showLoading({ title: '加载中...' });
     

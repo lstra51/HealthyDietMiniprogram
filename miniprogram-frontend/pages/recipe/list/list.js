@@ -26,7 +26,7 @@ Page({
       wx.hideLoading();
       
       if (res.code === 200) {
-        const recipes = res.data;
+        const recipes = api.formatRecipeImages(res.data);
         this.setData({ 
           recipes, 
           filteredRecipes: recipes 

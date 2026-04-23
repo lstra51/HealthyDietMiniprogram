@@ -73,7 +73,7 @@ Page({
       this.setData({ loading: false });
 
       if (res.code === 200) {
-        this.setData({ favorites: res.data || [] });
+        this.setData({ favorites: api.formatRecipeImages(res.data) });
       }
     } catch (err) {
       this.setData({ loading: false });

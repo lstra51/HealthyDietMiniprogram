@@ -1,13 +1,16 @@
 package com.cupk.healthy_diet.config;
 
+import com.cupk.healthy_diet.security.AuthTokenManager;
 import com.cupk.healthy_diet.service.SparkChatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import java.util.Map;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final SparkChatService sparkChatService;
+    private final AuthTokenManager authTokenManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -28,9 +32,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         ChatRequest request = objectMapper.readValue(payload, ChatRequest.class);
+        AuthTokenManager.AuthUser authUser = getAuthUser(session);
 
         sparkChatService.streamChat(
-            request.getUserId(),
+            authUser.id(),
             request.getMessage(),
             (List<Map<String, String>>) (List<?>) request.getHistory(),
             new SparkChatService.StreamCallback() {
@@ -76,6 +81,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         );
+    }
+
+    private AuthTokenManager.AuthUser getAuthUser(WebSocketSession session) {
+        MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(session.getUri()).build().getQueryParams();
+        return authTokenManager.parseToken(params.getFirst("token"));
     }
 
     @Override

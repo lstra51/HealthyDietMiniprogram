@@ -16,7 +16,8 @@
     "pages/statistics/statistics",
     "pages/profile/profile",
     "pages/chat/chat",
-    "pages/favorites/favorites"
+    "pages/favorites/favorites",
+    "pages/dish-recognition/dish-recognition"
   ],
   "window": {
     "navigationBarTextStyle": "black",

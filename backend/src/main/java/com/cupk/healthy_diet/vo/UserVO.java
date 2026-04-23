@@ -13,4 +13,9 @@ public class UserVO {
     private String nickname;
     private String avatarUrl;
     private String role;
+    private String token;
+
+    public UserVO(Integer id, String username, String nickname, String avatarUrl, String role) {
+        this(id, username, nickname, avatarUrl, role, null);
+    }
 }
