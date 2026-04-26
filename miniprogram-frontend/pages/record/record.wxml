@@ -1,64 +1,70 @@
 <view class="page">
   <view class="summary-section">
-    <view class="section-title">今日摄入</view>
-    <view class="nutrition-summary">
-      <view class="summary-item">
-        <view class="summary-value">{{todayTotal.totalCalories || 0}}</view>
-        <view class="summary-label">千卡</view>
+    <view class="section-title">{{selectedDate}} 摄入进度</view>
+    <view class="progress-list">
+      <view class="progress-item" wx:for="{{progressItems}}" wx:key="label">
+        <view class="progress-row">
+          <view class="progress-label">{{item.label}}</view>
+          <view class="progress-value">{{item.value}} / {{item.target}} {{item.unit}}</view>
+        </view>
+        <view class="progress-track">
+          <view class="progress-fill" style="width: {{item.progress}}%;"></view>
+        </view>
       </view>
-      <view class="summary-item">
-        <view class="summary-value">{{todayTotal.totalProtein || 0}}g</view>
-        <view class="summary-label">蛋白质</view>
-      </view>
-      <view class="summary-item">
-        <view class="summary-value">{{todayTotal.totalCarbs || 0}}g</view>
-        <view class="summary-label">碳水</view>
-      </view>
-      <view class="summary-item">
-        <view class="summary-value">{{todayTotal.totalFat || 0}}g</view>
-        <view class="summary-label">脂肪</view>
+    </view>
+  </view>
+
+  <view class="calendar-section">
+    <view class="calendar-header">
+      <view class="month-btn" data-offset="-1" bindtap="changeMonth">‹</view>
+      <view class="calendar-title">{{currentMonthText}}</view>
+      <view class="month-btn" data-offset="1" bindtap="changeMonth">›</view>
+    </view>
+    <view class="week-row">
+      <view class="week-cell">日</view>
+      <view class="week-cell">一</view>
+      <view class="week-cell">二</view>
+      <view class="week-cell">三</view>
+      <view class="week-cell">四</view>
+      <view class="week-cell">五</view>
+      <view class="week-cell">六</view>
+    </view>
+    <view class="calendar-grid">
+      <view
+        wx:for="{{calendarDays}}"
+        wx:key="date"
+        class="calendar-day {{item.inMonth ? '' : 'muted'}} {{item.selected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}"
+        data-date="{{item.date}}"
+        bindtap="selectDate"
+      >
+        <view>{{item.day}}</view>
+        <view class="record-dot" wx:if="{{item.hasRecord}}"></view>
       </view>
     </view>
   </view>
 
   <view class="records-section">
     <view class="section-header">
-      <view class="section-title">今日记录</view>
+      <view class="section-title">当日记录</view>
       <button class="add-btn" bindtap="goToRecipeList">+ 添加记录</button>
     </view>
 
-    <view class="empty-state" wx:if="{{todayRecords.length === 0}}">
+    <view class="empty-state" wx:if="{{selectedRecords.length === 0}}">
       <view class="empty-icon">📝</view>
-      <view class="empty-text">今天还没有记录哦</view>
+      <view class="empty-text">这一天还没有饮食记录</view>
     </view>
 
     <view class="record-list" wx:else>
-      <view wx:for="{{todayRecords}}" wx:key="id" class="record-item">
+      <view wx:for="{{selectedRecords}}" wx:key="id" class="record-item">
         <view class="record-left">
           <view class="meal-type">{{item.mealType}}</view>
           <view class="recipe-name">{{item.recipeName}}</view>
-          <view class="portion">× {{item.portion}}份</view>
+          <view class="portion">x {{item.portion}} 份</view>
         </view>
         <view class="record-right">
-          <view class="record-calories">{{item.calories}} 千卡</view>
-          <view class="record-nutrition">
-            蛋白{{item.protein}}g · 碳水{{item.carbs}}g · 脂肪{{item.fat}}g
-          </view>
+          <view class="record-calories">{{item.calories}} kcal</view>
+          <view class="record-nutrition">蛋白{{item.protein}}g · 碳水{{item.carbs}}g · 脂肪{{item.fat}}g</view>
           <view class="delete-btn" data-id="{{item.id}}" bindtap="deleteRecord">删除</view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <view class="history-section" wx:if="{{allRecords.length > 0}}">
-    <view class="section-title">历史记录</view>
-    <view class="history-list">
-      <view wx:for="{{allRecords}}" wx:key="id" class="history-item" wx:if="{{item.recordDate !== today}}">
-        <view class="history-date">{{item.recordDate}}</view>
-        <view class="history-content">
-          <view class="history-meal">{{item.mealType}}</view>
-          <view class="history-name">{{item.recipeName}}</view>
-          <view class="history-calories">{{item.calories}}千卡</view>
         </view>
       </view>
     </view>

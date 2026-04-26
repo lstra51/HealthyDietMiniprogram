@@ -2,12 +2,12 @@
   <view class="container">
     <view class="section">
       <view class="section-title">基本信息</view>
-      
+
       <view class="form-item">
         <view class="label">身高 (cm)</view>
-        <input 
-          class="input" 
-          type="digit" 
+        <input
+          class="input"
+          type="digit"
           placeholder="请输入身高"
           value="{{height}}"
           bindinput="onHeightInput"
@@ -16,9 +16,9 @@
 
       <view class="form-item">
         <view class="label">体重 (kg)</view>
-        <input 
-          class="input" 
-          type="digit" 
+        <input
+          class="input"
+          type="digit"
           placeholder="请输入体重"
           value="{{weight}}"
           bindinput="onWeightInput"
@@ -29,7 +29,7 @@
         <view class="label">BMI 指数</view>
         <view class="bmi-display">
           <text class="bmi-value">{{bmi}}</text>
-          <text class="bmi-status {{bmiStatus}}">{{bmiStatus}}</text>
+          <text class="bmi-status">{{bmiStatus}}</text>
         </view>
       </view>
 
@@ -44,29 +44,32 @@
     <view class="section">
       <view class="section-title">健康目标</view>
       <view class="goal-options">
-        <view 
-          class="goal-option {{goal === '减脂' ? 'active' : ''}}"
-          bindtap="selectGoal"
-          data-goal="减脂"
-        >
+        <view class="goal-option {{goal === '减脂' ? 'active' : ''}}" bindtap="selectGoal" data-goal="减脂">
           <view class="goal-icon">🔥</view>
           <view class="goal-label">减脂</view>
         </view>
-        <view 
-          class="goal-option {{goal === '增肌' ? 'active' : ''}}"
-          bindtap="selectGoal"
-          data-goal="增肌"
-        >
+        <view class="goal-option {{goal === '增肌' ? 'active' : ''}}" bindtap="selectGoal" data-goal="增肌">
           <view class="goal-icon">💪</view>
           <view class="goal-label">增肌</view>
         </view>
-        <view 
-          class="goal-option {{goal === '保持' ? 'active' : ''}}"
-          bindtap="selectGoal"
-          data-goal="保持"
-        >
-          <view class="goal-icon">⚖️</view>
+        <view class="goal-option {{goal === '保持' ? 'active' : ''}}" bindtap="selectGoal" data-goal="保持">
+          <view class="goal-icon">🌿</view>
           <view class="goal-label">保持</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">忌口 / 过敏 / 疾病标签</view>
+      <view class="preference-options">
+        <view
+          wx:for="{{preferenceOptions}}"
+          wx:key="label"
+          class="preference-option {{item.active ? 'active' : ''}}"
+          data-index="{{index}}"
+          bindtap="togglePreference"
+        >
+          <view class="preference-label">{{item.label}}</view>
         </view>
       </view>
     </view>

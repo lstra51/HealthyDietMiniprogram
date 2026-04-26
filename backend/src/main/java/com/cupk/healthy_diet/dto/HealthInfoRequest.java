@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class HealthInfoRequest {
     private Integer userId;
@@ -27,4 +29,6 @@ public class HealthInfoRequest {
     @NotNull(message = "健康目标不能为空")
     @Pattern(regexp = "减脂|增肌|保持", message = "健康目标只能是减脂、增肌或保持")
     private String goal;
+
+    private List<String> dietaryPreferences;
 }

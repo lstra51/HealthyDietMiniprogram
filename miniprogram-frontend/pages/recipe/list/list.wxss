@@ -12,24 +12,98 @@
 .search-box {
   display: flex;
   gap: 16rpx;
+  align-items: stretch;
 }
 
 .search-input {
-  flex: 1;
-  padding: 16rpx 20rpx;
+  flex: 3;
+  min-width: 0;
+  height: 88rpx;
+  padding: 0 20rpx;
   border: 1rpx solid #e0e0e0;
   border-radius: 8rpx;
   font-size: 26rpx;
   background-color: #f9f9f9;
+  box-sizing: border-box;
 }
 
 .search-btn {
-  padding: 16rpx 32rpx;
+  flex: 1;
+  height: 88rpx;
+  padding: 0 20rpx;
   background-color: #4CAF50;
   color: #ffffff;
   border-radius: 8rpx;
   font-size: 26rpx;
+  line-height: 88rpx;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.filter-btn {
+  flex: 1;
+  height: 88rpx;
+  padding: 0 20rpx;
+  background-color: #ffffff;
+  color: #4CAF50;
+  border: 1rpx solid #4CAF50;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  line-height: 88rpx;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.filter-panel {
+  margin-top: 16rpx;
+  padding: 20rpx;
+  background-color: #ffffff;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.filter-input,
+.goal-picker {
+  min-height: 92rpx;
+  padding: 24rpx 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #333333;
+  box-sizing: border-box;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.reset-btn,
+.apply-btn {
+  flex: 1;
+  border-radius: 8rpx;
+  font-size: 26rpx;
   line-height: 1;
+  padding: 18rpx 0;
+}
+
+.reset-btn {
+  background-color: #eeeeee;
+  color: #555555;
+}
+
+.apply-btn {
+  background-color: #4CAF50;
+  color: #ffffff;
 }
 
 .category-section {

@@ -44,6 +44,14 @@ Page({
       return;
     }
 
+    if (password.length < 6 || password.length > 50) {
+      wx.showToast({
+        title: '密码长度需为6到50位',
+        icon: 'none'
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
       wx.showToast({
         title: '两次密码不一致',
@@ -57,7 +65,7 @@ Page({
     try {
       const res = await api.post('/auth/register', { username, password });
       wx.hideLoading();
-      
+
       if (res.code === 200) {
         wx.showToast({
           title: '注册成功',
@@ -76,7 +84,7 @@ Page({
     } catch (err) {
       wx.hideLoading();
       wx.showToast({
-        title: '网络错误，请稍后重试',
+        title: err.message || '注册失败，请重试',
         icon: 'none'
       });
       console.error('注册请求失败:', err);

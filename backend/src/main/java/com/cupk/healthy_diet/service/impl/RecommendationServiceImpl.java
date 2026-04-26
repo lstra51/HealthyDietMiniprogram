@@ -59,6 +59,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             finalScores = hybridRecommend(ruleScores, contentScores, cfScores);
         }
 
+        finalScores = applyPreferenceFilter(finalScores, healthInfo);
         List<RecommendationVO> recommendations = convertToVO(finalScores, healthInfo, breakdownMap);
 
         List<Integer> recipeIds = recommendations.stream()
@@ -138,6 +139,71 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
                 .limit(TOP_N)
                 .collect(Collectors.toList());
+    }
+
+    private List<RecipeScore> applyPreferenceFilter(List<RecipeScore> scores, HealthInfo healthInfo) {
+        Set<String> preferences = parsePreferences(healthInfo);
+        if (preferences.isEmpty()) {
+            return scores;
+        }
+        return scores.stream()
+                .filter(score -> isAllowedByPreferences(score.getRecipe(), preferences))
+                .limit(TOP_N)
+                .collect(Collectors.toList());
+    }
+
+    private Set<String> parsePreferences(HealthInfo healthInfo) {
+        if (healthInfo == null || healthInfo.getDietaryPreferences() == null || healthInfo.getDietaryPreferences().isBlank()) {
+            return Set.of();
+        }
+        return Arrays.stream(healthInfo.getDietaryPreferences().split(","))
+                .map(String::trim)
+                .filter(item -> !item.isBlank())
+                .collect(Collectors.toSet());
+    }
+
+    private boolean isAllowedByPreferences(Recipe recipe, Set<String> preferences) {
+        String features = collectRecipeFeatures(recipe);
+        for (String preference : preferences) {
+            if ("糖尿病".equals(preference) && containsAny(features, "高糖", "甜品", "甜食", "糖", "蜂蜜", "奶茶", "饮料")) {
+                return false;
+            }
+            if ("低盐".equals(preference) && containsAny(features, "高盐", "咸", "腌", "腊", "酱菜", "咸菜")) {
+                return false;
+            }
+            if ("忌辣".equals(preference) && containsAny(features, "辣", "麻辣", "香辣", "辣椒", "剁椒")) {
+                return false;
+            }
+            if ("素食".equals(preference) && containsAny(features, "肉", "鸡", "鸭", "牛", "羊", "猪", "鱼", "虾", "蟹", "海鲜", "培根", "火腿")) {
+                return false;
+            }
+            if ("海鲜过敏".equals(preference) && containsAny(features, "海鲜", "鱼", "虾", "蟹", "贝", "蛤", "鱿鱼")) {
+                return false;
+            }
+            if ("花生过敏".equals(preference) && containsAny(features, "花生")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String collectRecipeFeatures(Recipe recipe) {
+        List<String> parts = new ArrayList<>();
+        if (recipe.getName() != null) parts.add(recipe.getName());
+        if (recipe.getCategory() != null) parts.add(recipe.getCategory());
+        if (recipe.getDescription() != null) parts.add(recipe.getDescription());
+        parts.addAll(recipeService.getRecipeTags(recipe.getId()));
+        parts.addAll(recipeService.getRecipeIngredients(recipe.getId()));
+        return String.join(" ", parts);
+    }
+
+    private boolean containsAny(String text, String... keywords) {
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<RecommendationVO> convertToVO(List<RecipeScore> scores, HealthInfo healthInfo, Map<Integer, ScoreBreakdown> breakdownMap) {

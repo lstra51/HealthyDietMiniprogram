@@ -1,23 +1,67 @@
 <view class="page">
   <view class="search-section">
     <view class="search-box">
-      <input 
-        class="search-input" 
-        placeholder="搜索食谱" 
+      <input
+        class="search-input"
+        placeholder="搜索食谱"
         value="{{searchKeyword}}"
         bindinput="onSearchInput"
         bindconfirm="onSearch"
       />
       <button class="search-btn" bindtap="onSearch">搜索</button>
+      <button class="filter-btn" bindtap="toggleFilter">筛选</button>
+    </view>
+  </view>
+
+  <view class="filter-panel" wx:if="{{filterOpen}}">
+    <view class="filter-grid">
+      <input
+        class="filter-input"
+        type="number"
+        placeholder="最低热量"
+        value="{{minCalories}}"
+        data-field="minCalories"
+        bindinput="onFilterInput"
+      />
+      <input
+        class="filter-input"
+        type="number"
+        placeholder="最高热量"
+        value="{{maxCalories}}"
+        data-field="maxCalories"
+        bindinput="onFilterInput"
+      />
+      <input
+        class="filter-input"
+        type="digit"
+        placeholder="蛋白质下限"
+        value="{{minProtein}}"
+        data-field="minProtein"
+        bindinput="onFilterInput"
+      />
+      <input
+        class="filter-input"
+        placeholder="标签，如低脂"
+        value="{{tag}}"
+        data-field="tag"
+        bindinput="onFilterInput"
+      />
+    </view>
+    <picker mode="selector" range="{{goals}}" bindchange="onGoalChange">
+      <view class="goal-picker">健康目标：{{goal || '全部'}}</view>
+    </picker>
+    <view class="filter-actions">
+      <button class="reset-btn" bindtap="resetFilters">重置</button>
+      <button class="apply-btn" bindtap="applyFilters">应用筛选</button>
     </view>
   </view>
 
   <view class="category-section">
     <scroll-view class="category-scroll" scroll-x="true">
       <view class="category-list">
-        <view 
-          wx:for="{{categories}}" 
-          wx:key="*this" 
+        <view
+          wx:for="{{categories}}"
+          wx:key="*this"
           class="category-item {{activeCategory === item ? 'active' : ''}}"
           data-category="{{item}}"
           bindtap="onCategoryTap"
@@ -29,28 +73,23 @@
   </view>
 
   <view class="recipe-list">
-    <view 
-      wx:if="{{filteredRecipes.length === 0}}" 
-      class="empty-state"
-    >
-      暂无食谱
-    </view>
-    <view 
-      wx:else 
-      class="recipe-grid"
-    >
-      <view 
-        wx:for="{{filteredRecipes}}" 
-        wx:key="id" 
-        class="recipe-card"
-        data-id="{{item.id}}"
-        bindtap="goToDetail"
-      >
-        <image class="recipe-image" src="{{item.image || 'https://via.placeholder.com/200'}}" mode="aspectFill" />
+    <view wx:if="{{recipes.length === 0}}" class="empty-state">暂无食谱</view>
+    <view wx:else class="recipe-grid">
+      <view wx:for="{{recipes}}" wx:key="id" class="recipe-card" data-id="{{item.id}}" bindtap="goToDetail">
+        <image
+          class="recipe-image"
+          src="{{item.image}}"
+          mode="aspectFill"
+          data-index="{{index}}"
+          binderror="onImageError"
+        />
         <view class="recipe-info">
           <view class="recipe-name">{{item.name}}</view>
           <view class="recipe-category">{{item.category}}</view>
-          <view class="recipe-calories">{{item.calories}} 千卡</view>
+          <view class="recipe-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+            <text wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tagItem" class="tag">{{tagItem}}</text>
+          </view>
+          <view class="recipe-calories">{{item.calories}} kcal · 蛋白{{item.protein || 0}}g</view>
         </view>
       </view>
     </view>

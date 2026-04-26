@@ -27,8 +27,13 @@ public class RecipeController {
     @GetMapping
     public Result<List<RecipeVO>> getRecipeList(
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String keyword) {
-        List<RecipeVO> recipes = recipeService.getRecipeList(category, keyword);
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer minCalories,
+            @RequestParam(required = false) Integer maxCalories,
+            @RequestParam(required = false) Double minProtein,
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) String goal) {
+        List<RecipeVO> recipes = recipeService.getRecipeList(category, keyword, minCalories, maxCalories, minProtein, tag, goal);
         return Result.success(recipes);
     }
 

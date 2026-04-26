@@ -90,5 +90,14 @@ Page({
     wx.navigateTo({
       url: '/pages/recipe/detail/detail?id=' + id
     });
+  },
+
+  onImageError(e) {
+    const index = e.currentTarget.dataset.index;
+    const favorites = this.data.favorites.slice();
+    if (favorites[index]) {
+      favorites[index].image = api.DEFAULT_RECIPE_IMAGE;
+      this.setData({ favorites });
+    }
   }
 });

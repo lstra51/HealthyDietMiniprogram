@@ -21,6 +21,8 @@ public class HealthInfo {
 
     private String goal;
 
+    private String dietaryPreferences;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

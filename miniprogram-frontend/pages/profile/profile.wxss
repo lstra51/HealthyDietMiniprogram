@@ -127,6 +127,27 @@
   border-top: 1rpx solid #f0f0f0;
 }
 
+.preference-section {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.preference-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.preference-tag {
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  font-size: 24rpx;
+}
+
 .bmi-label {
   font-size: 26rpx;
   color: #666666;

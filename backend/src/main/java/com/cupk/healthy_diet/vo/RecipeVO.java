@@ -15,6 +15,9 @@ public class RecipeVO {
     private String category;
     private String image;
     private Integer calories;
+    private Double protein;
+    private Double carbs;
+    private Double fat;
     private List<String> tags;
     private String status;
     private String rejectReason;

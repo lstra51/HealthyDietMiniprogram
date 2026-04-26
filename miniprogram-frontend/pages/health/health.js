@@ -1,5 +1,4 @@
 const app = getApp();
-const api = require('../../utils/api.js');
 
 Page({
   data: {
@@ -9,7 +8,16 @@ Page({
     goal: '减脂',
     goalText: '减脂',
     bmi: '',
-    bmiStatus: ''
+    bmiStatus: '',
+    preferenceOptions: [
+      { label: '糖尿病', active: false },
+      { label: '低盐', active: false },
+      { label: '忌辣', active: false },
+      { label: '素食', active: false },
+      { label: '海鲜过敏', active: false },
+      { label: '花生过敏', active: false }
+    ],
+    dietaryPreferences: []
   },
 
   onLoad() {
@@ -26,13 +34,9 @@ Page({
         cancelText: '取消',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/auth/login/login'
-            });
+            wx.navigateTo({ url: '/pages/auth/login/login' });
           } else {
-            wx.switchTab({
-              url: '/pages/home/home'
-            });
+            wx.switchTab({ url: '/pages/home/home' });
           }
         }
       });
@@ -49,14 +53,23 @@ Page({
       goal: '减脂',
       goalText: '减脂',
       bmi: '',
-      bmiStatus: ''
+      bmiStatus: '',
+      preferenceOptions: [
+        { label: '糖尿病', active: false },
+        { label: '低盐', active: false },
+        { label: '忌辣', active: false },
+        { label: '素食', active: false },
+        { label: '海鲜过敏', active: false },
+        { label: '花生过敏', active: false }
+      ],
+      dietaryPreferences: []
     });
   },
 
   loadSavedInfo() {
-    var savedInfo = app.globalData.healthInfo;
+    const savedInfo = app.globalData.healthInfo;
     if (savedInfo) {
-      var newData = {};
+      const newData = {};
       if (savedInfo.height) newData.height = savedInfo.height;
       if (savedInfo.weight) newData.weight = savedInfo.weight;
       if (savedInfo.gender) newData.gender = savedInfo.gender;
@@ -64,6 +77,12 @@ Page({
         newData.goal = savedInfo.goal;
         newData.goalText = savedInfo.goal;
       }
+      const savedPreferences = savedInfo.dietaryPreferences || [];
+      newData.dietaryPreferences = savedPreferences;
+      newData.preferenceOptions = this.data.preferenceOptions.map(opt => ({
+        ...opt,
+        active: savedPreferences.includes(opt.label)
+      }));
       this.setData(newData);
       this.calculateBMI();
     }
@@ -71,6 +90,7 @@ Page({
 
   onHeightInput(e) {
     this.setData({ height: e.detail.value });
+    this.calculateBMI();
   },
 
   onWeightInput(e) {
@@ -83,23 +103,26 @@ Page({
     this.setData({ gender: genders[e.detail.value] });
   },
 
-  onGoalChange(e) {
-    const goals = ['减脂', '增肌', '保持'];
-    const goal = goals[e.detail.value];
-    this.setData({ goal, goalText: goal });
-  },
-
   selectGoal(e) {
     const goal = e.currentTarget.dataset.goal;
     this.setData({ goal, goalText: goal });
   },
 
+  togglePreference(e) {
+    const index = e.currentTarget.dataset.index;
+    const preferenceOptions = this.data.preferenceOptions.slice();
+    preferenceOptions[index].active = !preferenceOptions[index].active;
+    const dietaryPreferences = preferenceOptions
+      .filter(opt => opt.active)
+      .map(opt => opt.label);
+    this.setData({ preferenceOptions, dietaryPreferences });
+  },
+
   calculateBMI() {
-    var height = this.data.height;
-    var weight = this.data.weight;
+    const { height, weight } = this.data;
     if (height && weight) {
-      var bmi = app.calculateBMI(parseFloat(height), parseFloat(weight));
-      var bmiStatus = '';
+      const bmi = app.calculateBMI(parseFloat(height), parseFloat(weight));
+      let bmiStatus = '';
       if (bmi < 18.5) {
         bmiStatus = '偏瘦';
       } else if (bmi < 24) {
@@ -109,69 +132,44 @@ Page({
       } else {
         bmiStatus = '肥胖';
       }
-      this.setData({ bmi: bmi, bmiStatus: bmiStatus });
+      this.setData({ bmi, bmiStatus });
     }
   },
 
   async onSave() {
-    var height = this.data.height;
-    var weight = this.data.weight;
-    var gender = this.data.gender;
-    var goal = this.data.goal;
-    var userId = null;
-    if (app.globalData.userInfo) {
-      userId = app.globalData.userInfo.id;
-    }
+    const { height, weight, gender, goal, dietaryPreferences } = this.data;
+    const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
 
     if (!userId) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
-
     if (!height) {
-      wx.showToast({
-        title: '请输入身高',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请输入身高', icon: 'none' });
       return;
     }
-
     if (!weight) {
-      wx.showToast({
-        title: '请输入体重',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请输入体重', icon: 'none' });
       return;
     }
 
     wx.showLoading({ title: '保存中...' });
-
     const success = await app.saveHealthInfo(userId, {
       height: parseFloat(height),
       weight: parseFloat(weight),
       gender,
-      goal
+      goal,
+      dietaryPreferences
     });
-
     wx.hideLoading();
 
     if (success) {
-      wx.showToast({
-        title: '保存成功',
-        icon: 'success'
-      });
-
+      wx.showToast({ title: '保存成功', icon: 'success' });
       setTimeout(() => {
         wx.navigateBack();
       }, 1000);
     } else {
-      wx.showToast({
-        title: '保存失败，请重试',
-        icon: 'none'
-      });
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' });
     }
   }
 });

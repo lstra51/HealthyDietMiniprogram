@@ -89,7 +89,8 @@ App({
         height: healthInfo.height,
         weight: healthInfo.weight,
         gender: healthInfo.gender,
-        goal: healthInfo.goal
+        goal: healthInfo.goal,
+        dietaryPreferences: healthInfo.dietaryPreferences || []
       });
       if (res.code === 200) {
         this.globalData.healthInfo = res.data;

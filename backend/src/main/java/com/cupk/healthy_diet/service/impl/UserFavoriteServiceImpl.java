@@ -72,6 +72,9 @@ public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, Use
             vo.setCategory(recipe.getCategory());
             vo.setImage(recipe.getImage());
             vo.setCalories(recipe.getCalories());
+            vo.setProtein(recipe.getProtein());
+            vo.setCarbs(recipe.getCarbs());
+            vo.setFat(recipe.getFat());
             return vo;
         }).collect(Collectors.toList());
     }

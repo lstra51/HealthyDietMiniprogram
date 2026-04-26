@@ -46,6 +46,13 @@ Page({
     }
   },
 
+  onRecipeImageError() {
+    if (!this.data.recipe) return;
+    this.setData({
+      recipe: Object.assign({}, this.data.recipe, { image: api.DEFAULT_RECIPE_IMAGE })
+    });
+  },
+
   async checkFavoriteStatus(userId, recipeId) {
     try {
       var res = await api.get('/favorites/check', { userId: userId, recipeId: recipeId });
@@ -160,7 +167,7 @@ Page({
           await new Promise((resolve) => {
             img.onload = resolve;
             img.onerror = resolve;
-            img.src = api.formatImageUrl(recipe.image) || 'https://via.placeholder.com/400';
+            img.src = api.formatImageUrl(recipe.image);
           });
           ctx.drawImage(img, 0, 0, width, 300);
         } catch (e) {
