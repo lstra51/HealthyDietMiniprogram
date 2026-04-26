@@ -24,6 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -215,8 +216,8 @@ public class SparkChatService {
 
     private String buildSystemPrompt(Integer userId) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("你是一位专业的健康饮食助手，只回答与健康饮食相关的问题。");
-        prompt.append("如果用户问其他问题，请礼貌地说明你只能回答健康饮食相关的问题。\n\n");
+        prompt.append("你是一位专业的健康饮食助手，只回答与健康饮食、营养和食谱相关的问题。");
+        prompt.append("如果用户询问其他主题，请礼貌说明你只能回答健康饮食相关问题。\n\n");
 
         HealthInfo healthInfo = healthInfoMapper.selectOne(
                 new LambdaQueryWrapper<HealthInfo>().eq(HealthInfo::getUserId, userId)
@@ -228,35 +229,53 @@ public class SparkChatService {
             if (healthInfo.getWeight() != null) prompt.append("- 体重：").append(healthInfo.getWeight()).append("kg\n");
             if (healthInfo.getGender() != null) prompt.append("- 性别：").append(healthInfo.getGender()).append("\n");
             if (healthInfo.getGoal() != null) prompt.append("- 目标：").append(healthInfo.getGoal()).append("\n");
+            if (healthInfo.getDietaryPreferences() != null && !healthInfo.getDietaryPreferences().isBlank()) {
+                prompt.append("- 忌口/过敏/疾病标签：").append(healthInfo.getDietaryPreferences()).append("\n");
+            }
         } else {
             prompt.append("用户尚未填写健康信息。\n");
         }
 
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(6);
         List<DietRecord> recentRecords = dietRecordMapper.selectList(
                 new LambdaQueryWrapper<DietRecord>()
                         .eq(DietRecord::getUserId, userId)
-                        .orderByDesc(DietRecord::getRecordDate)
-                        .last("LIMIT 10")
+                        .between(DietRecord::getRecordDate, startDate, endDate)
+                        .orderByAsc(DietRecord::getRecordDate)
+                        .orderByAsc(DietRecord::getCreatedAt)
         );
 
         if (!recentRecords.isEmpty()) {
-            prompt.append("\n用户最近的饮食记录：\n");
+            prompt.append("\n用户近 7 天饮食记录汇总：\n");
+            Map<LocalDate, DailySummary> summaries = new java.util.TreeMap<>();
             for (DietRecord record : recentRecords) {
-                prompt.append("- ").append(record.getRecordDate()).append(" ")
-                        .append(record.getMealType()).append(": ")
-                        .append(record.getRecipeName());
-                if (record.getCalories() != null) {
-                    prompt.append(" (").append(record.getCalories()).append("千卡/份, 份数")
-                            .append(record.getPortion() != null ? record.getPortion() : 1.0)
-                            .append(")");
-                }
-                prompt.append("\n");
+                double portion = record.getPortion() != null ? record.getPortion() : 1.0;
+                DailySummary summary = summaries.computeIfAbsent(record.getRecordDate(), date -> new DailySummary());
+                summary.calories += record.getCalories() == null ? 0 : record.getCalories() * portion;
+                summary.protein += record.getProtein() == null ? 0 : record.getProtein() * portion;
+                summary.carbs += record.getCarbs() == null ? 0 : record.getCarbs() * portion;
+                summary.fat += record.getFat() == null ? 0 : record.getFat() * portion;
+                summary.items.add(record.getMealType() + ":" + record.getRecipeName());
             }
+            summaries.forEach((date, summary) -> prompt.append("- ")
+                    .append(date)
+                    .append("：约")
+                    .append(Math.round(summary.calories))
+                    .append("kcal，蛋白质")
+                    .append(round(summary.protein))
+                    .append("g，碳水")
+                    .append(round(summary.carbs))
+                    .append("g，脂肪")
+                    .append(round(summary.fat))
+                    .append("g；餐食：")
+                    .append(String.join("、", summary.items))
+                    .append("\n"));
         } else {
-            prompt.append("\n用户暂无饮食记录。\n");
+            prompt.append("\n用户近 7 天暂无饮食记录。\n");
         }
 
-        prompt.append("\n请根据以上用户信息，提供个性化的健康饮食建议。");
+        prompt.append("\n请结合健康目标、忌口/过敏/疾病标签和近 7 天记录，给出具体、可执行、不过度医疗化的饮食建议。");
         return prompt.toString();
     }
 
@@ -300,5 +319,17 @@ public class SparkChatService {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private double round(double value) {
+        return Math.round(value * 10.0) / 10.0;
+    }
+
+    private static class DailySummary {
+        double calories = 0;
+        double protein = 0;
+        double carbs = 0;
+        double fat = 0;
+        List<String> items = new ArrayList<>();
     }
 }

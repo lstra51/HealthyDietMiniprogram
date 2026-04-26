@@ -1,5 +1,5 @@
 <view class="page" wx:if="{{recipe}}">
-  <image class="recipe-image" src="{{recipe.image || 'https://via.placeholder.com/400'}}" mode="aspectFill" />
+  <image class="recipe-image" src="{{recipe.image}}" mode="aspectFill" binderror="onRecipeImageError" />
   
   <view class="content">
     <view class="section">

@@ -123,6 +123,15 @@ Page({
     this.connectWebSocket(text);
   },
 
+  sendWeeklyAdvice() {
+    if (this.data.loading || this.data.isStreaming) return;
+    this.setData({
+      inputText: '请结合我近7天饮食记录，给出今日饮食调整建议和接下来三天的注意事项。',
+      canSend: true
+    });
+    this.sendMessage();
+  },
+
   connectWebSocket(userMessage) {
     const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
     const token = app.globalData.userInfo && app.globalData.userInfo.token ? app.globalData.userInfo.token : '';

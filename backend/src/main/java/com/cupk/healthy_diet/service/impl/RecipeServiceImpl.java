@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +29,8 @@ public class RecipeServiceImpl extends ServiceImpl<RecipeMapper, Recipe> impleme
     private final RecipeSuitableGoalMapper recipeSuitableGoalMapper;
 
     @Override
-    public List<RecipeVO> getRecipeList(String category, String keyword) {
+    public List<RecipeVO> getRecipeList(String category, String keyword, Integer minCalories, Integer maxCalories,
+                                        Double minProtein, String tag, String goal) {
         LambdaQueryWrapper<Recipe> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Recipe::getStatus, "approved");
         
@@ -41,20 +44,30 @@ public class RecipeServiceImpl extends ServiceImpl<RecipeMapper, Recipe> impleme
                     .like(Recipe::getDescription, keyword));
         }
 
+        if (minCalories != null) {
+            wrapper.ge(Recipe::getCalories, minCalories);
+        }
+
+        if (maxCalories != null) {
+            wrapper.le(Recipe::getCalories, maxCalories);
+        }
+
+        if (minProtein != null) {
+            wrapper.ge(Recipe::getProtein, minProtein);
+        }
+
+        Set<Integer> candidateIds = findRecipeIdsByTagAndGoal(tag, goal);
+        if (candidateIds != null) {
+            if (candidateIds.isEmpty()) {
+                return List.of();
+            }
+            wrapper.in(Recipe::getId, candidateIds);
+        }
+
         List<Recipe> recipes = this.list(wrapper);
         
         return recipes.stream().map(recipe -> {
-            List<String> tags = getRecipeTags(recipe.getId());
-            RecipeVO vo = new RecipeVO();
-            vo.setId(recipe.getId());
-            vo.setName(recipe.getName());
-            vo.setCategory(recipe.getCategory());
-            vo.setImage(recipe.getImage());
-            vo.setCalories(recipe.getCalories());
-            vo.setTags(tags);
-            vo.setStatus(recipe.getStatus());
-            vo.setRejectReason(recipe.getRejectReason());
-            return vo;
+            return convertToRecipeVO(recipe, getRecipeTags(recipe.getId()));
         }).collect(Collectors.toList());
     }
 
@@ -253,17 +266,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipeMapper, Recipe> impleme
                 .orderByDesc(Recipe::getCreatedAt);
         List<Recipe> recipes = this.list(wrapper);
         return recipes.stream().map(recipe -> {
-            List<String> tags = getRecipeTags(recipe.getId());
-            RecipeVO vo = new RecipeVO();
-            vo.setId(recipe.getId());
-            vo.setName(recipe.getName());
-            vo.setCategory(recipe.getCategory());
-            vo.setImage(recipe.getImage());
-            vo.setCalories(recipe.getCalories());
-            vo.setTags(tags);
-            vo.setStatus(recipe.getStatus());
-            vo.setRejectReason(recipe.getRejectReason());
-            return vo;
+            return convertToRecipeVO(recipe, getRecipeTags(recipe.getId()));
         }).collect(Collectors.toList());
     }
 
@@ -297,17 +300,7 @@ public class RecipeServiceImpl extends ServiceImpl<RecipeMapper, Recipe> impleme
                 .orderByDesc(Recipe::getCreatedAt);
         List<Recipe> recipes = this.list(wrapper);
         return recipes.stream().map(recipe -> {
-            List<String> tags = getRecipeTags(recipe.getId());
-            RecipeVO vo = new RecipeVO();
-            vo.setId(recipe.getId());
-            vo.setName(recipe.getName());
-            vo.setCategory(recipe.getCategory());
-            vo.setImage(recipe.getImage());
-            vo.setCalories(recipe.getCalories());
-            vo.setTags(tags);
-            vo.setStatus(recipe.getStatus());
-            vo.setRejectReason(recipe.getRejectReason());
-            return vo;
+            return convertToRecipeVO(recipe, getRecipeTags(recipe.getId()));
         }).collect(Collectors.toList());
     }
 
@@ -379,5 +372,47 @@ public class RecipeServiceImpl extends ServiceImpl<RecipeMapper, Recipe> impleme
                 recipeStepMapper.insert(recipeStep);
             }
         }
+    }
+
+    private Set<Integer> findRecipeIdsByTagAndGoal(String tag, String goal) {
+        Set<Integer> ids = null;
+
+        if (tag != null && !tag.isBlank()) {
+            ids = recipeTagMapper.selectList(new LambdaQueryWrapper<RecipeTag>().eq(RecipeTag::getTag, tag.trim()))
+                    .stream()
+                    .map(RecipeTag::getRecipeId)
+                    .collect(Collectors.toCollection(HashSet::new));
+        }
+
+        if (goal != null && !goal.isBlank()) {
+            Set<Integer> goalIds = recipeSuitableGoalMapper.selectList(
+                            new LambdaQueryWrapper<RecipeSuitableGoal>().eq(RecipeSuitableGoal::getGoal, goal.trim()))
+                    .stream()
+                    .map(RecipeSuitableGoal::getRecipeId)
+                    .collect(Collectors.toCollection(HashSet::new));
+            if (ids == null) {
+                ids = goalIds;
+            } else {
+                ids.retainAll(goalIds);
+            }
+        }
+
+        return ids;
+    }
+
+    private RecipeVO convertToRecipeVO(Recipe recipe, List<String> tags) {
+        RecipeVO vo = new RecipeVO();
+        vo.setId(recipe.getId());
+        vo.setName(recipe.getName());
+        vo.setCategory(recipe.getCategory());
+        vo.setImage(recipe.getImage());
+        vo.setCalories(recipe.getCalories());
+        vo.setProtein(recipe.getProtein());
+        vo.setCarbs(recipe.getCarbs());
+        vo.setFat(recipe.getFat());
+        vo.setTags(tags);
+        vo.setStatus(recipe.getStatus());
+        vo.setRejectReason(recipe.getRejectReason());
+        return vo;
     }
 }

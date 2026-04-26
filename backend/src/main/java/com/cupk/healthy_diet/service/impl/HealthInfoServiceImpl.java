@@ -9,6 +9,9 @@ import com.cupk.healthy_diet.service.HealthInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class HealthInfoServiceImpl extends ServiceImpl<HealthInfoMapper, HealthInfo> implements HealthInfoService {
@@ -31,6 +34,7 @@ public class HealthInfoServiceImpl extends ServiceImpl<HealthInfoMapper, HealthI
         healthInfo.setWeight(request.getWeight());
         healthInfo.setGender(request.getGender());
         healthInfo.setGoal(request.getGoal());
+        healthInfo.setDietaryPreferences(joinPreferences(request.getDietaryPreferences()));
 
         if (existInfo != null) {
             this.updateById(healthInfo);
@@ -46,5 +50,17 @@ public class HealthInfoServiceImpl extends ServiceImpl<HealthInfoMapper, HealthI
         LambdaQueryWrapper<HealthInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(HealthInfo::getUserId, userId);
         return this.getOne(wrapper);
+    }
+
+    private String joinPreferences(List<String> preferences) {
+        if (preferences == null || preferences.isEmpty()) {
+            return null;
+        }
+        String joined = preferences.stream()
+                .filter(item -> item != null && !item.isBlank())
+                .map(String::trim)
+                .distinct()
+                .collect(Collectors.joining(","));
+        return joined.isBlank() ? null : joined;
     }
 }

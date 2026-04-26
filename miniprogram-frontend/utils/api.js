@@ -1,5 +1,6 @@
 const BASE_URL = 'https://health.cupk.space/api';
 const ASSET_BASE_URL = 'https://health.cupk.space';
+const DEFAULT_RECIPE_IMAGE = '/images/recipe.png';
 // const BASE_URL = 'http://localhost:8080/api';
 
 function getToken() {
@@ -44,9 +45,10 @@ function buildQueryParams(data) {
     return '';
   }
   const params = Object.keys(data)
+    .filter(key => data[key] !== undefined && data[key] !== null && data[key] !== '')
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`)
     .join('&');
-  return '?' + params;
+  return params ? '?' + params : '';
 }
 
 function request(url, method, data) {
@@ -173,32 +175,55 @@ function arrayBufferToString(buffer) {
 
 function uploadFile(url, filePath, formData) {
   return new Promise((resolve, reject) => {
-    wx.uploadFile({
-      url: BASE_URL + url,
-      filePath: filePath,
-      name: 'file',
-      formData: formData,
-      header: buildAuthHeaders(),
-      success: (res) => {
-        let responseData = null;
-        if (res.data) {
-          try {
-            responseData = JSON.parse(res.data);
-          } catch (e) {
-            responseData = null;
+    compressImageIfNeeded(filePath)
+      .then((preparedFilePath) => {
+        wx.uploadFile({
+          url: BASE_URL + url,
+          filePath: preparedFilePath,
+          name: 'file',
+          formData: formData,
+          header: buildAuthHeaders(),
+          success: (res) => {
+            let responseData = null;
+            if (res.data) {
+              try {
+                responseData = JSON.parse(res.data);
+              } catch (e) {
+                responseData = null;
+              }
+            }
+            if (res.statusCode === 200) {
+              resolve(responseData || res.data);
+            } else if (res.statusCode === 401) {
+              handleUnauthorized();
+              reject(new Error('请先登录'));
+            } else {
+              reject(new Error((responseData && responseData.message) || `上传失败(${res.statusCode})`));
+            }
+          },
+          fail: (err) => {
+            reject(new Error(err.errMsg || '上传失败，请检查网络'));
           }
-        }
-        if (res.statusCode === 200) {
-          resolve(responseData || res.data);
-        } else if (res.statusCode === 401) {
-          handleUnauthorized();
-          reject(new Error('请先登录'));
-        } else {
-          reject(new Error((responseData && responseData.message) || `上传失败(${res.statusCode})`));
-        }
+        });
+      })
+      .catch(reject);
+  });
+}
+
+function compressImageIfNeeded(filePath) {
+  return new Promise((resolve) => {
+    if (!filePath || !wx.compressImage) {
+      resolve(filePath);
+      return;
+    }
+    wx.compressImage({
+      src: filePath,
+      quality: 72,
+      success: (res) => {
+        resolve(res.tempFilePath || filePath);
       },
-      fail: (err) => {
-        reject(new Error(err.errMsg || '上传失败，请检查网络'));
+      fail: () => {
+        resolve(filePath);
       }
     });
   });
@@ -206,9 +231,12 @@ function uploadFile(url, filePath, formData) {
 
 function formatImageUrl(url) {
   if (!url) {
-    return '';
+    return DEFAULT_RECIPE_IMAGE;
   }
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image')) {
+    return url;
+  }
+  if (url === DEFAULT_RECIPE_IMAGE) {
     return url;
   }
   if (url.startsWith('/')) {
@@ -233,6 +261,7 @@ function formatRecipeImages(recipes) {
 module.exports = {
   BASE_URL,
   ASSET_BASE_URL,
+  DEFAULT_RECIPE_IMAGE,
   formatImageUrl,
   formatRecipeImage,
   formatRecipeImages,

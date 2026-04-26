@@ -12,4 +12,12 @@ public class DailyNutritionVO {
     private Double totalProtein;
     private Double totalCarbs;
     private Double totalFat;
+    private Integer targetCalories;
+    private Double targetProtein;
+    private Double targetCarbs;
+    private Double targetFat;
+    private Double caloriesProgress;
+    private Double proteinProgress;
+    private Double carbsProgress;
+    private Double fatProgress;
 }

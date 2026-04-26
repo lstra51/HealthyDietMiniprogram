@@ -21,7 +21,7 @@
         bindtap="goToRecipeDetail"
         data-id="{{item.id}}"
       >
-        <image class="recipe-image" src="{{item.image || 'https://via.placeholder.com/200'}}" mode="aspectFill" />
+        <image class="recipe-image" src="{{item.image}}" mode="aspectFill" data-index="{{index}}" binderror="onImageError" />
         <view class="recipe-info">
           <view class="recipe-name">{{item.name}}</view>
           <view class="recipe-category">{{item.category}}</view>

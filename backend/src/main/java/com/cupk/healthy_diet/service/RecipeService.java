@@ -10,7 +10,8 @@ import com.cupk.healthy_diet.vo.RecipeVO;
 import java.util.List;
 
 public interface RecipeService extends IService<Recipe> {
-    List<RecipeVO> getRecipeList(String category, String keyword);
+    List<RecipeVO> getRecipeList(String category, String keyword, Integer minCalories, Integer maxCalories,
+                                 Double minProtein, String tag, String goal);
     RecipeDetailVO getRecipeDetail(Integer id);
     List<String> getRecipeIngredients(Integer recipeId);
     List<String> getRecipeTags(Integer recipeId);

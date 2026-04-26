@@ -45,10 +45,16 @@
         <text class="bmi-status {{bmiStatus}}">{{bmiStatus}}</text>
       </view>
     </view>
+    <view class="preference-section" wx:if="{{healthInfo.dietaryPreferences && healthInfo.dietaryPreferences.length > 0}}">
+      <view class="bmi-label">饮食标签</view>
+      <view class="preference-list">
+        <text wx:for="{{healthInfo.dietaryPreferences}}" wx:key="*this" class="preference-tag">{{item}}</text>
+      </view>
+    </view>
   </view>
 
   <view class="no-health-card" wx:if="{{userInfo && !healthInfo}}">
-    <view class="no-health-icon">📝</view>
+    <view class="no-health-icon">📋</view>
     <view class="no-health-text">还没有填写健康信息</view>
     <button class="fill-health-btn" bindtap="goToHealth">填写健康信息</button>
   </view>
@@ -60,7 +66,7 @@
       <view class="menu-arrow">›</view>
     </view>
     <view class="menu-item" bindtap="goToHealth">
-      <view class="menu-icon">⚙️</view>
+      <view class="menu-icon">🩺</view>
       <view class="menu-label">修改健康信息</view>
       <view class="menu-arrow">›</view>
     </view>
@@ -70,12 +76,12 @@
       <view class="menu-arrow">›</view>
     </view>
     <view class="menu-item" bindtap="goToStatistics">
-      <view class="menu-icon">📈</view>
+      <view class="menu-icon">📊</view>
       <view class="menu-label">数据统计</view>
       <view class="menu-arrow">›</view>
     </view>
     <view class="menu-item" bindtap="goToRecord">
-      <view class="menu-icon">📊</view>
+      <view class="menu-icon">📝</view>
       <view class="menu-label">饮食记录</view>
       <view class="menu-arrow">›</view>
     </view>
