@@ -1,12 +1,12 @@
 <view class="page" wx:if="{{recipe}}">
   <image class="recipe-image" src="{{recipe.image}}" mode="aspectFill" binderror="onRecipeImageError" />
-  
+
   <view class="content">
     <view class="section">
       <view class="section-header">
         <view class="section-title">{{recipe.name}}</view>
         <view class="favorite-btn" bindtap="toggleFavorite">
-          <text class="{{isFavorited ? 'favorited' : ''}}">{{isFavorited ? '❤️' : '🤍'}}</text>
+          <text class="{{isFavorited ? 'favorited' : ''}}">{{isFavorited ? '已收藏' : '收藏'}}</text>
         </view>
       </view>
       <view class="tags">
@@ -19,7 +19,7 @@
       <view class="nutrition-grid">
         <view class="nutrition-item">
           <view class="nutrition-value">{{recipe.calories}}</view>
-          <view class="nutrition-label">千卡</view>
+          <view class="nutrition-label">kcal</view>
         </view>
         <view class="nutrition-item">
           <view class="nutrition-value">{{recipe.protein}}</view>
@@ -56,7 +56,7 @@
 
   <view class="fixed-bottom">
     <button class="share-btn" bindtap="showShareModal">分享</button>
-    <button class="add-record-btn" bindtap="showAddRecordModal">添加到饮食记录</button>
+    <button class="add-record-btn" bindtap="showAddRecordModal">加入饮食记录</button>
   </view>
 
   <view class="modal-mask {{showRecordModal ? 'show' : ''}}" bindtap="hideAddRecordModal"></view>
@@ -90,9 +90,9 @@
       <view class="modal-close" bindtap="hideShareModal">×</view>
     </view>
     <view class="modal-body">
-      <canvas 
-        type="2d" 
-        id="posterCanvas" 
+      <canvas
+        type="2d"
+        id="posterCanvas"
         class="poster-canvas"
         canvas-id="posterCanvas">
       </canvas>

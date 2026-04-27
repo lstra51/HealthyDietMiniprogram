@@ -1,59 +1,80 @@
 const api = require('../../../utils/api.js');
 
+const GOALS = ['全部', '减脂', '增肌', '保持'];
+
 Page({
   data: {
     recipes: [],
-    categories: ['全部', '蔬菜', '肉类', '海鲜', '主食', '汤'],
-    activeCategory: '全部',
+    availableTags: [],
+    activeTag: '',
     searchKeyword: '',
     filterOpen: false,
     minCalories: '',
     maxCalories: '',
     minProtein: '',
-    tag: '',
-    goal: '',
-    goals: ['全部', '减脂', '增肌', '保持']
+    goal: '全部',
+    goals: GOALS
   },
 
   onLoad() {
-    this.loadRecipes();
+    this.loadPageData();
   },
 
   onShow() {
-    this.loadRecipes();
+    this.loadPageData();
+  },
+
+  async loadPageData() {
+    await Promise.all([this.loadAvailableTags(), this.loadRecipes()]);
+  },
+
+  async loadAvailableTags() {
+    try {
+      const res = await api.get('/recipes/tags');
+      if (res.code === 200) {
+        const availableTags = res.data || [];
+        const nextData = { availableTags };
+        if (this.data.activeTag && !availableTags.includes(this.data.activeTag)) {
+          nextData.activeTag = '';
+        }
+        this.setData(nextData);
+      }
+    } catch (err) {
+      console.error('加载标签失败:', err);
+    }
   },
 
   async loadRecipes() {
     wx.showLoading({ title: '加载中...' });
     try {
-      const params = this.buildQuery();
-      const res = await api.get('/recipes', params);
+      const res = await api.get('/recipes', this.buildQuery());
       if (res.code === 200) {
-        this.setData({ recipes: api.formatRecipeImages(res.data) });
+        this.setData({ recipes: api.formatRecipeImages(res.data || []) });
       }
     } catch (err) {
       console.error('加载食谱失败:', err);
-      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
+      wx.showToast({ title: '加载食谱失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }
   },
 
   buildQuery() {
-    const data = this.data;
     return {
-      category: data.activeCategory !== '全部' ? data.activeCategory : '',
-      keyword: data.searchKeyword,
-      minCalories: data.minCalories,
-      maxCalories: data.maxCalories,
-      minProtein: data.minProtein,
-      tag: data.tag,
-      goal: data.goal && data.goal !== '全部' ? data.goal : ''
+      keyword: this.data.searchKeyword.trim(),
+      minCalories: this.data.minCalories,
+      maxCalories: this.data.maxCalories,
+      minProtein: this.data.minProtein,
+      tag: this.data.activeTag,
+      goal: this.data.goal !== '全部' ? this.data.goal : ''
     };
   },
 
-  onCategoryTap(e) {
-    this.setData({ activeCategory: e.currentTarget.dataset.category });
+  onTagTap(e) {
+    const tag = e.currentTarget.dataset.tag || '';
+    this.setData({
+      activeTag: this.data.activeTag === tag ? '' : tag
+    });
     this.loadRecipes();
   },
 
@@ -75,7 +96,7 @@ Page({
   },
 
   onGoalChange(e) {
-    const goal = this.data.goals[e.detail.value];
+    const goal = this.data.goals[Number(e.detail.value)] || '全部';
     this.setData({ goal });
   },
 
@@ -88,8 +109,8 @@ Page({
       minCalories: '',
       maxCalories: '',
       minProtein: '',
-      tag: '',
-      goal: ''
+      activeTag: '',
+      goal: '全部'
     });
     this.loadRecipes();
   },

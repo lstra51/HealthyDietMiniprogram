@@ -1,11 +1,15 @@
 const api = require('../../../utils/api.js');
 
+const CATEGORIES = ['蔬菜', '肉类', '海鲜', '主食', '蛋类', '汤类'];
+const GOALS = ['减脂', '增肌', '保持'];
+
 Page({
   data: {
     id: null,
+    isAdminMode: false,
     name: '',
     category: '蔬菜',
-    categories: ['蔬菜', '肉类', '海鲜', '主食', '汤'],
+    categories: CATEGORIES,
     image: '',
     description: '',
     calories: 0,
@@ -15,14 +19,25 @@ Page({
     ingredients: [''],
     tags: [''],
     suitableGoals: ['减脂'],
-    goals: ['减脂', '增肌', '保持'],
+    goals: GOALS,
     steps: [''],
-    loading: false
+    loading: false,
+    submitButtonText: '提交食谱'
   },
 
   onLoad(options) {
+    const isAdminMode = options.mode === 'admin';
+    this.setData({
+      id: options.id || null,
+      isAdminMode,
+      submitButtonText: options.id ? '保存食谱' : '提交食谱'
+    });
+
+    wx.setNavigationBarTitle({
+      title: options.id ? '编辑食谱' : '上传食谱'
+    });
+
     if (options.id) {
-      this.setData({ id: options.id });
       this.loadRecipeDetail();
     }
   },
@@ -32,20 +47,23 @@ Page({
       if (res.code === 200) {
         const recipe = res.data;
         this.setData({
-          name: recipe.name,
-          category: recipe.category,
+          name: recipe.name || '',
+          category: recipe.category || '蔬菜',
           image: api.formatImageUrl(recipe.image),
-          description: recipe.description,
-          calories: recipe.calories,
-          protein: recipe.protein,
-          carbs: recipe.carbs,
-          fat: recipe.fat,
+          description: recipe.description || '',
+          calories: recipe.calories || 0,
+          protein: recipe.protein || 0,
+          carbs: recipe.carbs || 0,
+          fat: recipe.fat || 0,
           ingredients: recipe.ingredients && recipe.ingredients.length > 0 ? recipe.ingredients : [''],
           tags: recipe.tags && recipe.tags.length > 0 ? recipe.tags : [''],
           suitableGoals: recipe.suitableGoals && recipe.suitableGoals.length > 0 ? recipe.suitableGoals : ['减脂'],
           steps: recipe.steps && recipe.steps.length > 0 ? recipe.steps : ['']
         });
       }
+    }).catch(err => {
+      console.error('加载食谱详情失败:', err);
+      wx.showToast({ title: '加载失败', icon: 'none' });
     });
   },
 
@@ -55,7 +73,7 @@ Page({
   },
 
   onCategoryChange(e) {
-    const index = e.detail.value;
+    const index = Number(e.detail.value);
     this.setData({ category: this.data.categories[index] });
   },
 
@@ -65,8 +83,8 @@ Page({
 
   onNumberInput(e) {
     const field = e.currentTarget.dataset.field;
-    const value = parseFloat(e.detail.value) || 0;
-    this.setData({ [field]: value });
+    const value = parseFloat(e.detail.value);
+    this.setData({ [field]: Number.isNaN(value) ? 0 : value });
   },
 
   chooseImage() {
@@ -85,7 +103,6 @@ Page({
     wx.showLoading({ title: '上传中...' });
     api.uploadFile('/upload/image', filePath)
       .then(res => {
-        wx.hideLoading();
         if (res.code === 200) {
           this.setData({ image: res.data.url });
           wx.showToast({ title: '上传成功', icon: 'success' });
@@ -94,101 +111,87 @@ Page({
         }
       })
       .catch(err => {
-        wx.hideLoading();
         console.error(err);
         wx.showToast({ title: '上传失败', icon: 'none' });
+      })
+      .finally(() => {
+        wx.hideLoading();
       });
   },
 
   addIngredient() {
-    const ingredients = this.data.ingredients;
-    ingredients.push('');
-    this.setData({ ingredients });
+    this.setData({ ingredients: [...this.data.ingredients, ''] });
   },
 
   removeIngredient(e) {
-    const index = e.currentTarget.dataset.index;
-    const ingredients = this.data.ingredients;
-    if (ingredients.length > 1) {
-      ingredients.splice(index, 1);
-      this.setData({ ingredients });
-    }
+    const index = Number(e.currentTarget.dataset.index);
+    if (this.data.ingredients.length <= 1) return;
+    const ingredients = this.data.ingredients.slice();
+    ingredients.splice(index, 1);
+    this.setData({ ingredients });
   },
 
   onIngredientInput(e) {
-    const index = e.currentTarget.dataset.index;
-    const value = e.detail.value;
-    const ingredients = this.data.ingredients;
-    ingredients[index] = value;
+    const index = Number(e.currentTarget.dataset.index);
+    const ingredients = this.data.ingredients.slice();
+    ingredients[index] = e.detail.value;
     this.setData({ ingredients });
   },
 
   addTag() {
-    const tags = this.data.tags;
-    tags.push('');
-    this.setData({ tags });
+    this.setData({ tags: [...this.data.tags, ''] });
   },
 
   removeTag(e) {
-    const index = e.currentTarget.dataset.index;
-    const tags = this.data.tags;
-    if (tags.length > 1) {
-      tags.splice(index, 1);
-      this.setData({ tags });
-    }
+    const index = Number(e.currentTarget.dataset.index);
+    if (this.data.tags.length <= 1) return;
+    const tags = this.data.tags.slice();
+    tags.splice(index, 1);
+    this.setData({ tags });
   },
 
   onTagInput(e) {
-    const index = e.currentTarget.dataset.index;
-    const value = e.detail.value;
-    const tags = this.data.tags;
-    tags[index] = value;
+    const index = Number(e.currentTarget.dataset.index);
+    const tags = this.data.tags.slice();
+    tags[index] = e.detail.value;
     this.setData({ tags });
   },
 
   onGoalChange(e) {
-    const index = e.currentTarget.dataset.index;
-    const value = this.data.goals[e.detail.value];
-    const suitableGoals = this.data.suitableGoals;
-    suitableGoals[index] = value;
+    const index = Number(e.currentTarget.dataset.index);
+    const suitableGoals = this.data.suitableGoals.slice();
+    suitableGoals[index] = this.data.goals[Number(e.detail.value)] || '减脂';
     this.setData({ suitableGoals });
   },
 
   addGoal() {
-    const suitableGoals = this.data.suitableGoals;
-    suitableGoals.push('减脂');
-    this.setData({ suitableGoals });
+    this.setData({ suitableGoals: [...this.data.suitableGoals, '减脂'] });
   },
 
   removeGoal(e) {
-    const index = e.currentTarget.dataset.index;
-    const suitableGoals = this.data.suitableGoals;
-    if (suitableGoals.length > 1) {
-      suitableGoals.splice(index, 1);
-      this.setData({ suitableGoals });
-    }
+    const index = Number(e.currentTarget.dataset.index);
+    if (this.data.suitableGoals.length <= 1) return;
+    const suitableGoals = this.data.suitableGoals.slice();
+    suitableGoals.splice(index, 1);
+    this.setData({ suitableGoals });
   },
 
   addStep() {
-    const steps = this.data.steps;
-    steps.push('');
-    this.setData({ steps });
+    this.setData({ steps: [...this.data.steps, ''] });
   },
 
   removeStep(e) {
-    const index = e.currentTarget.dataset.index;
-    const steps = this.data.steps;
-    if (steps.length > 1) {
-      steps.splice(index, 1);
-      this.setData({ steps });
-    }
+    const index = Number(e.currentTarget.dataset.index);
+    if (this.data.steps.length <= 1) return;
+    const steps = this.data.steps.slice();
+    steps.splice(index, 1);
+    this.setData({ steps });
   },
 
   onStepInput(e) {
-    const index = e.currentTarget.dataset.index;
-    const value = e.detail.value;
-    const steps = this.data.steps;
-    steps[index] = value;
+    const index = Number(e.currentTarget.dataset.index);
+    const steps = this.data.steps.slice();
+    steps[index] = e.detail.value;
     this.setData({ steps });
   },
 
@@ -203,87 +206,70 @@ Page({
       return false;
     }
     if (data.calories <= 0) {
-      wx.showToast({ title: '请输入热量', icon: 'none' });
+      wx.showToast({ title: '请输入正确的热量', icon: 'none' });
       return false;
     }
-    const validIngredients = data.ingredients.filter(i => i.trim()).length;
-    if (validIngredients === 0) {
-      wx.showToast({ title: '请至少添加一个食材', icon: 'none' });
+    if (data.ingredients.filter(item => item.trim()).length === 0) {
+      wx.showToast({ title: '请至少填写一种食材', icon: 'none' });
       return false;
     }
-    const validSteps = data.steps.filter(s => s.trim()).length;
-    if (validSteps === 0) {
-      wx.showToast({ title: '请至少添加一个步骤', icon: 'none' });
+    if (data.steps.filter(item => item.trim()).length === 0) {
+      wx.showToast({ title: '请至少填写一个步骤', icon: 'none' });
       return false;
     }
     return true;
   },
 
   submit() {
-    if (!this.validate()) return;
-    if (this.data.loading) return;
+    if (!this.validate() || this.data.loading) return;
 
     this.setData({ loading: true });
     wx.showLoading({ title: '提交中...' });
 
     const data = this.data;
     const recipeData = {
-      name: data.name,
+      name: data.name.trim(),
       category: data.category,
       image: data.image,
-      description: data.description,
+      description: data.description.trim(),
       calories: data.calories,
       protein: data.protein,
       carbs: data.carbs,
       fat: data.fat,
-      ingredients: data.ingredients.filter(i => i.trim()),
-      tags: data.tags.filter(t => t.trim()),
-      suitableGoals: [...new Set(data.suitableGoals)],
-      steps: data.steps.filter(s => s.trim())
+      ingredients: data.ingredients.map(item => item.trim()).filter(Boolean),
+      tags: data.tags.map(item => item.trim()).filter(Boolean),
+      suitableGoals: [...new Set(data.suitableGoals.map(item => item.trim()).filter(Boolean))],
+      steps: data.steps.map(item => item.trim()).filter(Boolean)
     };
 
-    if (this.data.id) {
-      api.put(`/recipes/${this.data.id}`, recipeData)
-        .then(res => {
-          wx.hideLoading();
-          if (res.code === 200) {
-            wx.showToast({ title: '提交成功', icon: 'success' });
-            setTimeout(() => {
-              wx.navigateBack();
-            }, 1500);
-          } else {
-            wx.showToast({ title: res.message || '提交失败', icon: 'none' });
-          }
-        })
-        .catch(err => {
-          wx.hideLoading();
-          console.error(err);
-          wx.showToast({ title: '提交失败', icon: 'none' });
-        })
-        .finally(() => {
-          this.setData({ loading: false });
-        });
+    let requestPromise;
+    if (this.data.id && this.data.isAdminMode) {
+      requestPromise = api.put(`/recipes/${this.data.id}/admin`, recipeData);
+    } else if (this.data.id) {
+      requestPromise = api.put(`/recipes/${this.data.id}`, recipeData);
     } else {
-      api.post('/recipes', recipeData)
-        .then(res => {
-          wx.hideLoading();
-          if (res.code === 200) {
-            wx.showToast({ title: '提交成功', icon: 'success' });
-            setTimeout(() => {
-              wx.navigateBack();
-            }, 1500);
-          } else {
-            wx.showToast({ title: res.message || '提交失败', icon: 'none' });
-          }
-        })
-        .catch(err => {
-          wx.hideLoading();
-          console.error(err);
-          wx.showToast({ title: '提交失败', icon: 'none' });
-        })
-        .finally(() => {
-          this.setData({ loading: false });
-        });
+      requestPromise = api.post('/recipes', recipeData);
     }
+
+    requestPromise
+      .then(res => {
+        if (res.code === 200) {
+          const successText = this.data.id ? '保存成功' : '提交成功';
+          wx.showToast({ title: successText, icon: 'success' });
+          setTimeout(() => {
+            wx.navigateBack();
+          }, 1200);
+        } else {
+          wx.showToast({ title: res.message || '提交失败', icon: 'none' });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        wx.showToast({ title: '提交失败', icon: 'none' });
+      })
+      .finally(() => {
+        wx.hideLoading();
+        this.setData({ loading: false });
+      });
   }
 });
