@@ -7,6 +7,7 @@
     "pages/recipe/list/list",
     "pages/recipe/detail/detail",
     "pages/recipe/create/create",
+    "pages/recipe/manage/manage",
     "pages/recipe/audit/audit",
     "pages/recipe/audit-detail/audit-detail",
     "pages/recipe/my-recipes/my-recipes",

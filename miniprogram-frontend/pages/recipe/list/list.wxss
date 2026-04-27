@@ -64,7 +64,6 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
-  margin-bottom: 16rpx;
 }
 
 .filter-input,
@@ -106,32 +105,34 @@
   color: #ffffff;
 }
 
-.category-section {
+.tag-section {
   padding: 20rpx 0;
   background-color: #ffffff;
   margin-top: 16rpx;
 }
 
-.category-scroll {
+.tag-scroll {
   white-space: nowrap;
 }
 
-.category-list {
+.tag-button-list {
   display: flex;
   padding: 0 20rpx;
   gap: 16rpx;
+  flex-wrap: nowrap;
 }
 
-.category-item {
+.tag-button {
   display: inline-block;
   padding: 12rpx 28rpx;
   border-radius: 30rpx;
   font-size: 26rpx;
   color: #666666;
   background-color: #f0f0f0;
+  flex-shrink: 0;
 }
 
-.category-item.active {
+.tag-button.active {
   background-color: #4CAF50;
   color: #ffffff;
 }

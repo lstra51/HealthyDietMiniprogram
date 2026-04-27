@@ -33,14 +33,29 @@ public class RecipeController {
             @RequestParam(required = false) Double minProtein,
             @RequestParam(required = false) String tag,
             @RequestParam(required = false) String goal) {
-        List<RecipeVO> recipes = recipeService.getRecipeList(category, keyword, minCalories, maxCalories, minProtein, tag, goal);
+        List<RecipeVO> recipes = recipeService.getRecipeList(
+                category, keyword, minCalories, maxCalories, minProtein, tag, goal);
         return Result.success(recipes);
+    }
+
+    @GetMapping("/tags")
+    public Result<List<String>> getAvailableTags() {
+        return Result.success(recipeService.getAvailableTags());
+    }
+
+    @GetMapping("/admin")
+    public Result<List<RecipeVO>> getAdminRecipeList(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword,
+            @RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
+        return Result.success(recipeService.getAdminRecipeList(status, category, keyword));
     }
 
     @GetMapping("/{id}")
     public Result<RecipeDetailVO> getRecipeDetail(@PathVariable Integer id) {
-        RecipeDetailVO recipe = recipeService.getRecipeDetail(id);
-        return Result.success(recipe);
+        return Result.success(recipeService.getRecipeDetail(id));
     }
 
     @PostMapping("/import")
@@ -57,15 +72,14 @@ public class RecipeController {
         Integer recipeId = recipeService.createRecipe(dto, userId);
         Map<String, Object> result = new HashMap<>();
         result.put("id", recipeId);
-        result.put("message", "食谱创建成功，等待审核");
+        result.put("message", "食谱已提交，等待审核");
         return Result.success(result);
     }
 
     @GetMapping("/pending")
     public Result<List<RecipeVO>> getPendingRecipes(@RequestAttribute(AuthContext.USER_ROLE) String role) {
         requireAdmin(role);
-        List<RecipeVO> recipes = recipeService.getPendingRecipes();
-        return Result.success(recipes);
+        return Result.success(recipeService.getPendingRecipes());
     }
 
     @PutMapping("/{id}/approve")
@@ -87,8 +101,7 @@ public class RecipeController {
 
     @GetMapping("/user")
     public Result<List<RecipeVO>> getUserRecipes(@RequestAttribute(AuthContext.USER_ID) Integer userId) {
-        List<RecipeVO> recipes = recipeService.getUserRecipes(userId);
-        return Result.success(recipes);
+        return Result.success(recipeService.getUserRecipes(userId));
     }
 
     @PutMapping("/{id}")
@@ -99,9 +112,26 @@ public class RecipeController {
         return Result.success();
     }
 
+    @PutMapping("/{id}/admin")
+    public Result<Void> adminUpdateRecipe(@PathVariable Integer id,
+                                          @Valid @RequestBody CreateRecipeDTO dto,
+                                          @RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
+        recipeService.adminUpdateRecipe(id, dto);
+        return Result.success();
+    }
+
+    @DeleteMapping("/{id}/admin")
+    public Result<Void> adminDeleteRecipe(@PathVariable Integer id,
+                                          @RequestAttribute(AuthContext.USER_ROLE) String role) {
+        requireAdmin(role);
+        recipeService.adminDeleteRecipe(id);
+        return Result.success();
+    }
+
     private void requireAdmin(String role) {
         if (!AuthContext.isAdmin(role)) {
-            throw new BusinessException(403, "需要管理员权限");
+            throw new BusinessException(403, "无权限访问");
         }
     }
 }

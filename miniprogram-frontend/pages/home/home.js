@@ -1,15 +1,16 @@
 const app = getApp();
-const api = require('../../utils/api.js');
 
 Page({
   data: {
     todayRecommendation: null,
     todayRecommendationFormatted: null,
     healthInfoFilled: false,
-    userName: '',
+    userName: '用户',
     currentDate: '',
     isLoggedIn: false,
-    isAdmin: false
+    isAdmin: false,
+    healthEntryIcon: '🩺',
+    healthEntryLabel: '填写健康信息'
   },
 
   onLoad() {
@@ -19,16 +20,8 @@ Page({
     this.checkHealthInfo();
   },
 
-  setCurrentDate() {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    const weekday = weekdays[now.getDay()];
-    this.setData({ currentDate: `${month}月${day}日 ${weekday}` });
-  },
-
   onShow() {
+    this.setCurrentDate();
     this.checkLoginStatus();
     this.checkHealthInfo();
     if (!app.globalData.isLoggedIn) {
@@ -36,6 +29,16 @@ Page({
     } else {
       this.loadTodayRecommendation();
     }
+  },
+
+  setCurrentDate() {
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    this.setData({
+      currentDate: `${month}月${day}日 ${weekdays[now.getDay()]}`
+    });
   },
 
   clearData() {
@@ -46,48 +49,55 @@ Page({
   },
 
   checkLoginStatus() {
-    const isLoggedIn = app.globalData.isLoggedIn;
-    this.setData({ isLoggedIn });
-    if (isLoggedIn && app.globalData.userInfo) {
-      const userInfo = app.globalData.userInfo;
-      const displayName = userInfo.nickname || userInfo.username || '用户';
-      const isAdmin = userInfo.role === 'admin';
-      this.setData({ userName: displayName, isAdmin });
-    }
+    const isLoggedIn = !!app.globalData.isLoggedIn;
+    const userInfo = app.globalData.userInfo || {};
+    this.setData({
+      isLoggedIn,
+      userName: userInfo.nickname || userInfo.username || '用户',
+      isAdmin: userInfo.role === 'admin'
+    });
   },
 
   async loadTodayRecommendation() {
     if (!app.globalData.isLoggedIn) return;
-    
+
     const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
     if (!userId) return;
 
-    const recommendations = await app.getRecommendations(userId);
-    if (recommendations.length > 0) {
-      const rec = recommendations[0];
-      var formatted = {};
-      for (var key in rec) {
-        if (rec.hasOwnProperty(key)) {
-          formatted[key] = rec[key];
-        }
+    try {
+      const recommendations = await app.getRecommendations(userId);
+      if (recommendations.length > 0) {
+        const rec = recommendations[0];
+        this.setData({
+          todayRecommendation: rec,
+          todayRecommendationFormatted: {
+            ...rec,
+            scoreFormatted: Math.round((rec.score || 0) * 100),
+            reason: rec.reason || '根据你的健康信息推荐'
+          }
+        });
+      } else {
+        this.clearData();
       }
-      formatted.scoreFormatted = Math.round(rec.score * 100);
-      this.setData({ 
-        todayRecommendation: rec,
-        todayRecommendationFormatted: formatted
-      });
+    } catch (err) {
+      console.error('加载今日推荐失败:', err);
     }
   },
 
   checkHealthInfo() {
-    this.setData({ healthInfoFilled: !!app.globalData.healthInfo });
+    const healthInfoFilled = !!app.globalData.healthInfo;
+    this.setData({
+      healthInfoFilled,
+      healthEntryIcon: healthInfoFilled ? '✏️' : '🩺',
+      healthEntryLabel: healthInfoFilled ? '修改健康信息' : '填写健康信息'
+    });
   },
 
   checkNeedLogin() {
     if (!app.globalData.isLoggedIn) {
       wx.showModal({
         title: '需要登录',
-        content: '此功能需要登录后才能使用，是否前往登录？',
+        content: '该功能需要登录后使用，是否前往登录？',
         confirmText: '去登录',
         cancelText: '取消',
         success: (res) => {
@@ -156,6 +166,13 @@ Page({
     if (!this.checkNeedLogin()) return;
     wx.navigateTo({
       url: '/pages/recipe/create/create'
+    });
+  },
+
+  goToManageRecipes() {
+    if (!this.checkNeedLogin()) return;
+    wx.navigateTo({
+      url: '/pages/recipe/manage/manage'
     });
   },
 

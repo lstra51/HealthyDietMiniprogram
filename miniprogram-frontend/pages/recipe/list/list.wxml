@@ -34,37 +34,37 @@
       <input
         class="filter-input"
         type="digit"
-        placeholder="蛋白质下限"
+        placeholder="最低蛋白质"
         value="{{minProtein}}"
         data-field="minProtein"
         bindinput="onFilterInput"
       />
-      <input
-        class="filter-input"
-        placeholder="标签，如低脂"
-        value="{{tag}}"
-        data-field="tag"
-        bindinput="onFilterInput"
-      />
+      <picker mode="selector" range="{{goals}}" value="{{goals.indexOf(goal)}}" bindchange="onGoalChange">
+        <view class="goal-picker">健康目标：{{goal}}</view>
+      </picker>
     </view>
-    <picker mode="selector" range="{{goals}}" bindchange="onGoalChange">
-      <view class="goal-picker">健康目标：{{goal || '全部'}}</view>
-    </picker>
     <view class="filter-actions">
       <button class="reset-btn" bindtap="resetFilters">重置</button>
       <button class="apply-btn" bindtap="applyFilters">应用筛选</button>
     </view>
   </view>
 
-  <view class="category-section">
-    <scroll-view class="category-scroll" scroll-x="true">
-      <view class="category-list">
+  <view class="tag-section">
+    <scroll-view class="tag-scroll" scroll-x="true" enable-flex="true">
+      <view class="tag-button-list">
         <view
-          wx:for="{{categories}}"
+          class="tag-button {{activeTag === '' ? 'active' : ''}}"
+          data-tag=""
+          bindtap="onTagTap"
+        >
+          全部
+        </view>
+        <view
+          wx:for="{{availableTags}}"
           wx:key="*this"
-          class="category-item {{activeCategory === item ? 'active' : ''}}"
-          data-category="{{item}}"
-          bindtap="onCategoryTap"
+          class="tag-button {{activeTag === item ? 'active' : ''}}"
+          data-tag="{{item}}"
+          bindtap="onTagTap"
         >
           {{item}}
         </view>
@@ -75,7 +75,13 @@
   <view class="recipe-list">
     <view wx:if="{{recipes.length === 0}}" class="empty-state">暂无食谱</view>
     <view wx:else class="recipe-grid">
-      <view wx:for="{{recipes}}" wx:key="id" class="recipe-card" data-id="{{item.id}}" bindtap="goToDetail">
+      <view
+        wx:for="{{recipes}}"
+        wx:key="id"
+        class="recipe-card"
+        data-id="{{item.id}}"
+        bindtap="goToDetail"
+      >
         <image
           class="recipe-image"
           src="{{item.image}}"
@@ -89,7 +95,7 @@
           <view class="recipe-tags" wx:if="{{item.tags && item.tags.length > 0}}">
             <text wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tagItem" class="tag">{{tagItem}}</text>
           </view>
-          <view class="recipe-calories">{{item.calories}} kcal · 蛋白{{item.protein || 0}}g</view>
+          <view class="recipe-calories">{{item.calories}} kcal · 蛋白 {{item.protein || 0}}g</view>
         </view>
       </view>
     </view>

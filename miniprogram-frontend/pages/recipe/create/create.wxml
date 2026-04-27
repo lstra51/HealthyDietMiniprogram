@@ -2,15 +2,26 @@
   <scroll-view class="content" scroll-y="true">
     <view class="section">
       <view class="section-title">基本信息</view>
-      
+
       <view class="form-item">
         <view class="label">食谱名称 *</view>
-        <input class="input" placeholder="请输入食谱名称" value="{{name}}" data-field="name" bindinput="onInput" />
+        <input
+          class="input"
+          placeholder="请输入食谱名称"
+          value="{{name}}"
+          data-field="name"
+          bindinput="onInput"
+        />
       </view>
 
       <view class="form-item">
         <view class="label">分类 *</view>
-        <picker mode="selector" range="{{categories}}" value="{{categories.indexOf(category)}}" bindchange="onCategoryChange">
+        <picker
+          mode="selector"
+          range="{{categories}}"
+          value="{{categories.indexOf(category)}}"
+          bindchange="onCategoryChange"
+        >
           <view class="picker">{{category}}</view>
         </picker>
       </view>
@@ -31,16 +42,23 @@
 
       <view class="form-item">
         <view class="label">描述</view>
-        <textarea class="textarea" placeholder="请输入食谱描述" value="{{description}}" data-field="description" bindinput="onInput" maxlength="500" />
+        <textarea
+          class="textarea"
+          placeholder="请输入食谱描述"
+          value="{{description}}"
+          data-field="description"
+          bindinput="onInput"
+          maxlength="500"
+        />
       </view>
     </view>
 
     <view class="section">
       <view class="section-title">营养成分</view>
-      
+
       <view class="nutrition-grid">
         <view class="nutrition-item">
-          <view class="label">热量(千卡)*</view>
+          <view class="label">热量(kcal) *</view>
           <input class="input" type="number" placeholder="0" value="{{calories}}" data-field="calories" bindinput="onNumberInput" />
         </view>
         <view class="nutrition-item">
@@ -84,7 +102,13 @@
       <view class="section-title">适用目标</view>
       <view class="dynamic-list">
         <view wx:for="{{suitableGoals}}" wx:key="index" class="list-item">
-          <picker mode="selector" range="{{goals}}" value="{{goals.indexOf(item)}}" data-index="{{index}}" bindchange="onGoalChange">
+          <picker
+            mode="selector"
+            range="{{goals}}"
+            value="{{goals.indexOf(item)}}"
+            data-index="{{index}}"
+            bindchange="onGoalChange"
+          >
             <view class="picker">{{item}}</view>
           </picker>
           <view wx:if="{{suitableGoals.length > 1}}" class="delete-btn" data-index="{{index}}" bindtap="removeGoal">×</view>
@@ -107,7 +131,7 @@
 
     <view class="submit-section">
       <button class="submit-btn" bindtap="submit" disabled="{{loading}}">
-        {{loading ? '提交中...' : '提交食谱'}}
+        {{loading ? '提交中...' : submitButtonText}}
       </button>
     </view>
   </scroll-view>

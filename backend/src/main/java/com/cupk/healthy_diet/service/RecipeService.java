@@ -17,11 +17,15 @@ public interface RecipeService extends IService<Recipe> {
     List<String> getRecipeTags(Integer recipeId);
     List<String> getRecipeSteps(Integer recipeId);
     List<String> getRecipeSuitableGoals(Integer recipeId);
+    List<String> getAvailableTags();
     void importRecipes(List<RecipeImportDTO> recipeDTOs);
     Integer createRecipe(CreateRecipeDTO dto, Integer userId);
     List<RecipeVO> getPendingRecipes();
+    List<RecipeVO> getAdminRecipeList(String status, String category, String keyword);
     void approveRecipe(Integer id);
     void rejectRecipe(Integer id, String reason);
     List<RecipeVO> getUserRecipes(Integer userId);
     void updateRecipe(Integer id, CreateRecipeDTO dto, Integer userId);
+    void adminUpdateRecipe(Integer id, CreateRecipeDTO dto);
+    void adminDeleteRecipe(Integer id);
 }

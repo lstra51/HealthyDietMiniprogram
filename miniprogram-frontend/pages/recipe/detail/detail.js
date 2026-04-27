@@ -12,27 +12,26 @@ Page({
   },
 
   onLoad(options) {
-    const id = parseInt(options.id);
+    const id = parseInt(options.id, 10);
     this.loadRecipeDetail(id);
   },
 
   async loadRecipeDetail(id) {
     wx.showLoading({ title: '加载中...' });
-    
+
     try {
-      var res = await api.get('/recipes/' + id);
+      const res = await api.get('/recipes/' + id);
       wx.hideLoading();
-      
+
       if (res.code === 200) {
-        var recipe = api.formatRecipeImage(res.data);
+        const recipe = api.formatRecipeImage(res.data);
         wx.setNavigationBarTitle({ title: recipe.name });
-        this.setData({ recipe: recipe });
-        
+        this.setData({ recipe });
+
         this.recordBehavior('view');
-        
-        var userId = null;
-        if (app.globalData.userInfo) {
-          userId = app.globalData.userInfo.id;
+
+        const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
+        if (userId) {
           this.checkFavoriteStatus(userId, id);
         }
       }
@@ -55,7 +54,7 @@ Page({
 
   async checkFavoriteStatus(userId, recipeId) {
     try {
-      var res = await api.get('/favorites/check', { userId: userId, recipeId: recipeId });
+      const res = await api.get('/favorites/check', { userId, recipeId });
       if (res.code === 200) {
         this.setData({ isFavorited: res.data });
       }
@@ -65,11 +64,7 @@ Page({
   },
 
   async toggleFavorite() {
-    var userId = null;
-    if (app.globalData.userInfo) {
-      userId = app.globalData.userInfo.id;
-    }
-    
+    const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
     if (!userId) {
       wx.showToast({
         title: '请先登录',
@@ -78,22 +73,22 @@ Page({
       return;
     }
 
-    var recipeId = this.data.recipe.id;
-    var isFavorited = this.data.isFavorited;
+    const recipeId = this.data.recipe.id;
+    const isFavorited = this.data.isFavorited;
 
     try {
       if (isFavorited) {
-        await api.delete('/favorites', { userId: userId, recipeId: recipeId });
+        await api.delete('/favorites', { userId, recipeId });
         this.setData({ isFavorited: false });
         wx.showToast({ title: '已取消收藏', icon: 'success' });
       } else {
-        await api.post('/favorites', { userId: userId, recipeId: recipeId });
+        await api.post('/favorites', { userId, recipeId });
         this.setData({ isFavorited: true });
         wx.showToast({ title: '收藏成功', icon: 'success' });
         this.recordBehavior('like');
       }
     } catch (err) {
-      console.error('操作失败:', err);
+      console.error('收藏操作失败:', err);
       wx.showToast({
         title: '操作失败，请重试',
         icon: 'none'
@@ -102,18 +97,14 @@ Page({
   },
 
   async recordBehavior(behaviorType) {
-    var userId = null;
-    if (app.globalData.userInfo) {
-      userId = app.globalData.userInfo.id;
-    }
-    
+    const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
     if (!userId || !this.data.recipe) return;
 
     try {
       await api.post('/recommendations/behavior', {
-        userId: userId,
+        userId,
         recipeId: this.data.recipe.id,
-        behaviorType: behaviorType
+        behaviorType
       });
     } catch (err) {
       console.error('记录行为失败:', err);
@@ -147,11 +138,11 @@ Page({
       .fields({ node: true, size: true })
       .exec(async (res) => {
         if (!res[0]) return;
-        
+
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
         const dpr = wx.getSystemInfoSync().pixelRatio;
-        
+
         canvas.width = res[0].width * dpr;
         canvas.height = res[0].height * dpr;
         ctx.scale(dpr, dpr);
@@ -176,7 +167,7 @@ Page({
           ctx.fillStyle = '#ffffff';
           ctx.font = '80px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('🥗', width / 2, 180);
+          ctx.fillText('食', width / 2, 180);
         }
 
         ctx.fillStyle = '#333';
@@ -186,7 +177,7 @@ Page({
 
         ctx.fillStyle = '#666';
         ctx.font = '24px sans-serif';
-        ctx.fillText(`热量: ${recipe.calories}kcal`, 20, 390);
+        ctx.fillText(`热量: ${recipe.calories} kcal`, 20, 390);
 
         const cardY = 410;
         const cardHeight = 60;
@@ -197,30 +188,26 @@ Page({
         ctx.fillStyle = '#fff';
         ctx.font = '20px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`蛋白质 ${recipe.protein}g`, 20 + cardWidth / 2, cardY + 38);
+        ctx.fillText(`蛋白 ${recipe.protein}g`, 20 + cardWidth / 2, cardY + 38);
 
         ctx.fillStyle = '#8BC34A';
         ctx.fillRect(30 + cardWidth, cardY, cardWidth, cardHeight);
         ctx.fillStyle = '#fff';
-        ctx.font = '20px sans-serif';
-        ctx.textAlign = 'center';
         ctx.fillText(`碳水 ${recipe.carbs}g`, 30 + cardWidth + cardWidth / 2, cardY + 38);
 
         ctx.fillStyle = '#FFC107';
         ctx.fillRect(40 + cardWidth * 2, cardY, cardWidth, cardHeight);
         ctx.fillStyle = '#fff';
-        ctx.font = '20px sans-serif';
-        ctx.textAlign = 'center';
         ctx.fillText(`脂肪 ${recipe.fat}g`, 40 + cardWidth * 2 + cardWidth / 2, cardY + 38);
 
         ctx.fillStyle = '#f5f5f5';
         ctx.fillRect(0, height - 120, width, 120);
-        
+
         ctx.fillStyle = '#4CAF50';
         ctx.font = 'bold 28px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('健康饮食推荐助手', width / 2, height - 65);
-        
+
         ctx.fillStyle = '#999';
         ctx.font = '20px sans-serif';
         ctx.fillText('扫码查看更多食谱', width / 2, height - 30);
@@ -232,12 +219,12 @@ Page({
       const query = wx.createSelectorQuery();
       query.select('#posterCanvas')
         .fields({ node: true, size: true })
-        .exec(async (res) => {
+        .exec((res) => {
           if (!res[0]) return;
-          
+
           const canvas = res[0].node;
           wx.canvasToTempFilePath({
-            canvas: canvas,
+            canvas,
             success: (fileRes) => {
               wx.saveImageToPhotosAlbum({
                 filePath: fileRes.tempFilePath,
@@ -252,7 +239,7 @@ Page({
                   if (err.errMsg.includes('auth deny')) {
                     wx.showModal({
                       title: '提示',
-                      content: '需要您授权保存图片到相册',
+                      content: '需要授权后才能保存图片到相册',
                       confirmText: '去授权',
                       success: (modalRes) => {
                         if (modalRes.confirm) {
@@ -295,14 +282,11 @@ Page({
   },
 
   async addToRecord() {
-    var recipe = this.data.recipe;
-    var mealType = this.data.mealType;
-    var portion = this.data.portion;
-    var userId = null;
-    if (app.globalData.userInfo) {
-      userId = app.globalData.userInfo.id;
-    }
-    
+    const recipe = this.data.recipe;
+    const mealType = this.data.mealType;
+    const portion = this.data.portion;
+    const userId = app.globalData.userInfo ? app.globalData.userInfo.id : null;
+
     if (!userId) {
       wx.showToast({
         title: '请先登录',
@@ -310,24 +294,24 @@ Page({
       });
       return;
     }
-    
+
     if (!recipe) return;
 
     wx.showLoading({ title: '保存中...' });
 
     try {
-      var recordDate = app.formatLocalDate(new Date());
-      var res = await api.post('/records', {
-        userId: userId,
+      const recordDate = app.formatLocalDate(new Date());
+      const res = await api.post('/records', {
+        userId,
         recipeId: recipe.id,
         recipeName: recipe.name,
-        mealType: mealType,
-        portion: portion,
+        mealType,
+        portion,
         calories: recipe.calories,
         protein: recipe.protein,
         carbs: recipe.carbs,
         fat: recipe.fat,
-        recordDate: recordDate
+        recordDate
       });
 
       wx.hideLoading();

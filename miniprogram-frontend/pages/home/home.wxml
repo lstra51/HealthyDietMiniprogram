@@ -1,20 +1,18 @@
 <view class="page">
   <view class="container">
     <view class="welcome-section">
-      <view class="greeting" wx:if="{{isLoggedIn}}">你好，{{userName}} 👋</view>
-      <view class="greeting" wx:else>欢迎使用健康饮食推荐助手 👋</view>
+      <view class="greeting" wx:if="{{isLoggedIn}}">你好，{{userName}}</view>
+      <view class="greeting" wx:else>欢迎使用健康饮食推荐助手</view>
       <view class="date">{{currentDate}}</view>
     </view>
 
     <view class="card login-tip-card" wx:if="{{!isLoggedIn}}">
-      <view class="section-title">登录体验更多功能</view>
-      <view class="login-desc">登录后可使用个性化推荐、记录饮食等功能</view>
-      <button class="login-btn" bindtap="goToLogin">
-        立即登录
-      </button>
+      <view class="section-title">登录后体验更多功能</view>
+      <view class="login-desc">登录后可使用个性化推荐、饮食记录、AI 营养师等功能。</view>
+      <button class="login-btn" bindtap="goToLogin">立即登录</button>
     </view>
 
-    <view class="card today-recommend-card" wx:if="{{isLoggedIn && todayRecommendation}}">
+    <view class="card today-recommend-card" wx:if="{{isLoggedIn && todayRecommendationFormatted}}">
       <view class="card-header">
         <view class="section-title">今日推荐</view>
         <view class="recommend-tag">为你精选</view>
@@ -22,39 +20,37 @@
       <view class="recommend-content" bindtap="onViewTodayDetail">
         <view class="recommend-info">
           <view class="dish-name">{{todayRecommendationFormatted.name}}</view>
-          <view class="dish-desc">推荐得分: {{todayRecommendationFormatted.scoreFormatted}}分</view>
-          <view class="dish-reason">{{todayRecommendationFormatted.reason}}</view>
-          <view class="view-detail-btn">查看详情 →</view>
+          <view class="dish-desc">推荐得分：{{todayRecommendationFormatted.scoreFormatted}} 分</view>
+          <view class="dish-desc">{{todayRecommendationFormatted.reason}}</view>
+          <view class="view-detail-btn">查看详情</view>
         </view>
       </view>
     </view>
 
     <view class="card action-card" wx:if="{{isLoggedIn}}">
       <view class="section-title">立即生成个性化推荐</view>
-      <view class="action-desc">根据你的健康信息，为你定制专属食谱</view>
-      <button class="action-btn primary" bindtap="goToRecommend">
-        生成推荐
-      </button>
+      <view class="action-desc">根据你的健康信息与目标，快速得到适合你的饮食建议。</view>
+      <button class="action-btn primary" bindtap="goToRecommend">生成推荐</button>
     </view>
 
     <view class="card quick-entry-card">
-      <view class="section-title">快速入口</view>
+      <view class="section-title">快捷入口</view>
       <view class="entry-grid">
         <view class="entry-item" bindtap="goToRecipeList">
-          <view class="entry-icon">📖</view>
+          <view class="entry-icon">🍽️</view>
           <view class="entry-label">浏览食谱</view>
         </view>
         <view class="entry-item" bindtap="goToCreateRecipe">
-          <view class="entry-icon">➕</view>
+          <view class="entry-icon">📤</view>
           <view class="entry-label">上传食谱</view>
         </view>
         <view class="entry-item" bindtap="goToMyRecipes">
-          <view class="entry-icon">📋</view>
+          <view class="entry-icon">📖</view>
           <view class="entry-label">我的食谱</view>
         </view>
         <view class="entry-item" bindtap="goToHealth">
-          <view class="entry-icon">{{isLoggedIn && healthInfoFilled ? '✅' : '📝'}}</view>
-          <view class="entry-label">{{isLoggedIn && healthInfoFilled ? '修改健康信息' : '填写健康信息'}}</view>
+          <view class="entry-icon">{{healthEntryIcon}}</view>
+          <view class="entry-label">{{healthEntryLabel}}</view>
         </view>
         <view class="entry-item" bindtap="goToRecommend">
           <view class="entry-icon">🎯</view>
@@ -62,15 +58,19 @@
         </view>
         <view class="entry-item" bindtap="goToChat">
           <view class="entry-icon">🤖</view>
-          <view class="entry-label">AI营养师</view>
+          <view class="entry-label">AI 营养师</view>
         </view>
         <view class="entry-item" bindtap="goToDishRecognition">
           <view class="entry-icon">📷</view>
           <view class="entry-label">拍照识别</view>
         </view>
         <view class="entry-item" wx:if="{{isAdmin}}" bindtap="goToAudit">
-          <view class="entry-icon">🔍</view>
+          <view class="entry-icon">✅</view>
           <view class="entry-label">审核食谱</view>
+        </view>
+        <view class="entry-item" wx:if="{{isAdmin}}" bindtap="goToManageRecipes">
+          <view class="entry-icon">🗂️</view>
+          <view class="entry-label">食谱管理</view>
         </view>
       </view>
     </view>
