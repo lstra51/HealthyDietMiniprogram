@@ -71,12 +71,6 @@
 			<version>3.5.7</version> <!-- 推荐使用 3.5.7 或更高 -->
 		</dependency>
 
-		<!-- Jasypt 加密 -->
-		<dependency>
-			<groupId>com.github.ulisesbocchio</groupId>
-			<artifactId>jasypt-spring-boot-starter</artifactId>
-			<version>3.0.5</version>
-		</dependency>
 
 		<!-- OkHttp for WebSocket -->
 		<dependency>

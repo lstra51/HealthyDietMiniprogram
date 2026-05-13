@@ -6,7 +6,7 @@
       <view class="section-header">
         <view class="section-title">{{recipe.name}}</view>
         <view class="favorite-btn" bindtap="toggleFavorite">
-          <text class="{{isFavorited ? 'favorited' : ''}}">{{isFavorited ? '已收藏' : '收藏'}}</text>
+          <text class="favorite-icon {{isFavorited ? 'favorited' : 'unfavorited'}}">{{isFavorited ? '♥' : '♡'}}</text>
         </view>
       </view>
       <view class="tags">

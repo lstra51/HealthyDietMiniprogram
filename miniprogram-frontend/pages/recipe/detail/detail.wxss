@@ -34,8 +34,22 @@
 }
 
 .favorite-btn {
-  font-size: 48rpx;
   padding: 8rpx;
+  line-height: 1;
+}
+
+.favorite-icon {
+  display: inline-block;
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.favorite-icon.unfavorited {
+  color: #bdbdbd;
+}
+
+.favorite-icon.favorited {
+  color: #ff4d4f;
 }
 
 .tags {
@@ -126,14 +140,11 @@
   bottom: 0;
   left: 0;
   right: 0;
+  display: flex;
+  gap: 20rpx;
   padding: 20rpx;
   background-color: #ffffff;
   box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.08);
-}
-
-.fixed-bottom {
-  display: flex;
-  gap: 20rpx;
 }
 
 .share-btn {
