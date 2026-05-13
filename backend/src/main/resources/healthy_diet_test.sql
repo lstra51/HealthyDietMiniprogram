@@ -4,7 +4,7 @@
  Source Server         : healthy_diet_server
  Source Server Type    : MySQL
  Source Server Version : 80045 (8.0.45-0ubuntu0.22.04.1)
- Source Host           : 101.42.200.52:3306
+ Source Host           : localhost:3306
  Source Schema         : healthy_diet_test
 
  Target Server Type    : MySQL

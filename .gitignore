@@ -56,6 +56,17 @@ desktop.ini
 *~
 
 # 通用 - 环境变量文件
+# Local thesis/document helper scripts
+/fix_thesis_postprocess.py
+/revise_thesis_draft.py
+/thesis_*.py
+
+# Keep the miniprogram project config under miniprogram-frontend/
+/project.config.json
+
+# Local ad-hoc backend resource images
+/backend/src/main/resources/images/Stir-fried Broccoli.png
+
 .env
 .env.local
 .env.*.local
