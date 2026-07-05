@@ -12,7 +12,7 @@ public class UploadStorageProperties {
     @Value("${file.upload.path:${FILE_UPLOAD_PATH:uploads}}")
     private String uploadPath;
 
-    @Value("${file.upload.base-url:${FILE_UPLOAD_BASE_URL:https://health.cupk.space}}")
+    @Value("${file.upload.base-url:${FILE_UPLOAD_BASE_URL:http://localhost:8080}}")
     private String baseUrl;
 
     public Path getUploadRoot() {

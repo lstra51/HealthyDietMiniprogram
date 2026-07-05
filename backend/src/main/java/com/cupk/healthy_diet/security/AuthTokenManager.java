@@ -17,7 +17,7 @@ public class AuthTokenManager {
     private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
     private static final Base64.Decoder URL_DECODER = Base64.getUrlDecoder();
 
-    @Value("${auth.token.secret:${AUTH_TOKEN_SECRET:healthy-diet-local-dev-secret}}")
+    @Value("${auth.token.secret:${AUTH_TOKEN_SECRET:change-this-token-secret}}")
     private String tokenSecret;
 
     @Value("${auth.token.expire-seconds:${AUTH_TOKEN_EXPIRE_SECONDS:604800}}")

@@ -17,17 +17,17 @@ class UploadStoragePropertiesTest {
     void keepsAbsoluteUploadPath() {
         UploadStorageProperties properties = new UploadStorageProperties();
         ReflectionTestUtils.setField(properties, "uploadPath", tempDir.toString());
-        ReflectionTestUtils.setField(properties, "baseUrl", "https://health.cupk.space/");
+        ReflectionTestUtils.setField(properties, "baseUrl", "http://localhost:8080/");
 
         assertEquals(tempDir.normalize(), properties.getUploadRoot());
-        assertEquals("https://health.cupk.space/uploads/a.jpg", properties.buildPublicUrl("/uploads/a.jpg"));
+        assertEquals("http://localhost:8080/uploads/a.jpg", properties.buildPublicUrl("/uploads/a.jpg"));
     }
 
     @Test
     void resolvesRelativeUploadPathFromWorkingDirectory() {
         UploadStorageProperties properties = new UploadStorageProperties();
         ReflectionTestUtils.setField(properties, "uploadPath", "uploads");
-        ReflectionTestUtils.setField(properties, "baseUrl", "https://health.cupk.space");
+        ReflectionTestUtils.setField(properties, "baseUrl", "http://localhost:8080");
 
         Path expected = Path.of(System.getProperty("user.dir")).resolve("uploads").normalize();
         assertEquals(expected, properties.getUploadRoot());

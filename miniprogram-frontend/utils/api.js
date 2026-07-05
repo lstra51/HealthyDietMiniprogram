@@ -1,5 +1,5 @@
-const BASE_URL = 'https://health.cupk.space/api';
-const ASSET_BASE_URL = 'https://health.cupk.space';
+const BASE_URL = 'http://localhost:8080/api';
+const ASSET_BASE_URL = 'http://localhost:8080';
 const DEFAULT_RECIPE_IMAGE = '/images/recipe.png';
 // const BASE_URL = 'http://localhost:8080/api';
 
